@@ -1,1 +1,13 @@
+@use './reset.scss';
 
+.rounded {
+	border-radius: 2rem;
+}
+
+.border {
+	border: 3px solid green;
+}
+
+.flex {
+	display: flex;
+}
