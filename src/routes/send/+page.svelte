@@ -1,17 +1,27 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { v4 as uuidv4 } from 'uuid';
 
 	import ToggleButtonIcon from '$components/ToggleButtonIcon.svelte';
 	import { Videocam, VideocamOff, Mic, MicOff } from 'svelte-ionicons';
 	import Stream from '$lib/Stream';
+	import JsonSocket from '$lib/JsonSocket';
 
 	let localPlayer: HTMLMediaElement;
 
 	let stream = new Stream();
 
+	const uuid = uuidv4();
+	const socket = new JsonSocket(
+		`ws://${location.hostname}:3000/api/connect?type=camera&uuid=${uuid}`
+	);
+	socket.connect();
+	socket.onMessage((message) => {
+		console.log(message);
+	});
+
 	onMount(async () => {
 		await stream.init();
-
 		localPlayer.srcObject = stream.getMediaSource()!;
 	});
 </script>
