@@ -20,8 +20,6 @@
 	);
 	socket.connect();
 	socket.onMessage(async (message) => {
-		console.log(message);
-
 		if (message.subject === 'camera-connected') {
 			const camera: ConnectedCamera = $state({
 				uuid: message.data.uuid,
@@ -35,7 +33,6 @@
 			// Eventlistener for ice candidates
 			camera.connection.addEventListener('icecandidate', (event) => {
 				if (event.candidate) {
-					console.log('sending ice-candidate...');
 					socket.send({
 						sender: uuid,
 						recipient: camera.uuid,
@@ -47,28 +44,22 @@
 
 			// Event listener for displaying remote stream
 			camera.connection.addEventListener('track', (event) => {
-				console.log('got track!');
-
 				camera.stream = event.streams[0];
 			});
 
 			// Handling messages
 			socket.onMessage((message) => {
 				if (message.sender === camera.uuid && message.subject === 'answer') {
-					console.log('got answer!');
 					camera.connection.setRemoteDescription(new RTCSessionDescription(message.data));
 				}
 
 				if (message.sender === camera.uuid && message.subject === 'ice-candidate') {
-					console.log('got ice-candidate!');
 					camera.connection.addIceCandidate(message.data);
 				}
 			});
 
 			const offer = await camera.connection.createOffer();
 			await camera.connection.setLocalDescription(offer);
-
-			console.log('sending offer...');
 			socket.send({
 				sender: uuid,
 				recipient: camera.uuid,

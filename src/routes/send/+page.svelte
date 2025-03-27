@@ -20,7 +20,6 @@
 		);
 		socket.connect();
 		socket.onMessage(async (message) => {
-			console.log(message);
 
 			if (message.subject === 'offer') {
 				const monitorUuid = message.sender;
@@ -36,7 +35,6 @@
 				// Eventlistener for ice candidates
 				peerConnection.addEventListener('icecandidate', (event) => {
 					if (event.candidate) {
-						console.log('sending ice-candidate...');
 						socket.send({
 							sender: uuid,
 							recipient: monitorUuid,
@@ -49,7 +47,6 @@
 				// Handling messages
 				socket.onMessage((message) => {
 					if (message.sender === monitorUuid && message.subject === 'ice-candidate') {
-						console.log('got ice-candidate!');
 						peerConnection.addIceCandidate(message.data);
 					}
 				});
@@ -58,8 +55,6 @@
 
 				const answer = await peerConnection.createAnswer();
 				await peerConnection.setLocalDescription(answer);
-
-				console.log('sending answer...');
 				socket.send({
 					sender: uuid,
 					recipient: monitorUuid,
