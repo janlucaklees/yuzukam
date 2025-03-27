@@ -16,8 +16,46 @@
 		`ws://${location.hostname}:3000/api/connect?type=camera&uuid=${uuid}`
 	);
 	socket.connect();
-	socket.onMessage((message) => {
+	socket.onMessage(async (message) => {
 		console.log(message);
+
+		if (message.subject === 'offer') {
+			const monitorUuid = message.sender;
+
+			// Create the peer connection
+			const peerConnection = new RTCPeerConnection();
+
+			// Add the video stream to the peer connection.
+			for (const track of stream.getMediaSource().getTracks()) {
+				peerConnection.addTrack(track, stream.getMediaSource());
+			}
+
+			// Eventlistener for ice candidates
+			peerConnection.addEventListener('icecandidate', (event) => {
+				if (event.candidate) {
+					console.log('sending ice-candidate...');
+					socket.send({
+						sender: uuid,
+						recipient: monitorUuid,
+						subject: 'ice-candidate',
+						data: event.candidate
+					});
+				}
+			});
+
+			peerConnection.setRemoteDescription(new RTCSessionDescription(message.data));
+
+			const answer = await peerConnection.createAnswer();
+			await peerConnection.setLocalDescription(answer);
+
+			console.log('sending answer...');
+			socket.send({
+				sender: uuid,
+				recipient: monitorUuid,
+				subject: 'answer',
+				data: answer
+			});
+		}
 	});
 
 	onMount(async () => {

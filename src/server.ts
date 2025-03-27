@@ -11,7 +11,7 @@ type ClientData = {
 
 const clients = new Map<string, ServerWebSocket<ClientData>>();
 
-Bun.serve<ClientData>({
+const server = Bun.serve<ClientData>({
 	port: PORT,
 	hostname: '0.0.0.0',
 	fetch(req, server) {
@@ -62,14 +62,20 @@ Bun.serve<ClientData>({
 			clients.set(ws.data.uuid, ws);
 
 			if (ws.data.type === 'monitor') {
+				// Add the monitor to the channel with all monitors to communicate
+				// connection and disconnection of cameras.
+				ws.subscribe('monitors');
+
+				// Send the newly connected monitor all available cameras.
 				clients
 					.values()
 					.filter((client) => client.data.type === 'camera')
 					.forEach((client) =>
 						ws.send(
 							JSON.stringify({
+								sender: 'system',
 								recipient: ws.data.uuid,
-								subject: 'camera-available',
+								subject: 'camera-connected',
 								data: {
 									uuid: client.data.uuid
 								}
@@ -77,8 +83,57 @@ Bun.serve<ClientData>({
 						)
 					);
 			}
+
+			if (ws.data.type === 'camera') {
+				// Notify all monitors, that there is a new camera.
+				server.publish(
+					'monitors',
+					JSON.stringify({
+						sender: 'system',
+						recipient: 'all',
+						subject: 'camera-connected',
+						data: {
+							uuid: ws.data.uuid
+						}
+					})
+				);
+			}
+		},
+		message(ws, rawMessage) {
+			const message = JSON.parse(rawMessage.toString());
+
+			if (!clients.has(message.recipient)) {
+				ws.send(
+					JSON.stringify({
+						erro: true
+					})
+				);
+			}
+
+			const recipient = clients.get(message.recipient);
+
+			recipient.send(rawMessage);
 		},
 		close(ws) {
+			if (ws.data.type === 'monitor') {
+				ws.unsubscribe('monitors');
+			}
+
+			if (ws.data.type === 'camera') {
+				// Notify all monitors, that a camera disconnected.
+				server.publish(
+					'monitors',
+					JSON.stringify({
+						sender: 'system',
+						recipient: 'all',
+						subject: 'camera-disconnected',
+						data: {
+							uuid: ws.data.uuid
+						}
+					})
+				);
+			}
+
 			clients.delete(ws.data.uuid);
 		}
 	}
