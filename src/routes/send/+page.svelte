@@ -15,12 +15,32 @@
 			audio: true
 		});
 
+		const battery = await navigator.getBattery();
+
 		const socket = new JsonSocket(
 			`ws://${location.hostname}:3000/api/connect?type=camera&uuid=${uuid}`
 		);
-		socket.connect();
-		socket.onMessage(async (message) => {
 
+		function sendMetaDataUpdate() {
+			socket.send({
+				sender: uuid,
+				recipient: 'monitors',
+				subject: 'meta-data',
+				data: {
+					batteryStatus: {
+						level: battery.level,
+						charging: battery.charging,
+					}
+				}
+			});
+		}
+
+		socket.connect().then(() => {
+			sendMetaDataUpdate();
+			battery.addEventListener("chargingchange", (event) => sendMetaDataUpdate());
+			battery.addEventListener("levelchange", (event) => sendMetaDataUpdate());
+		})
+		socket.onMessage(async (message) => {
 			if (message.subject === 'offer') {
 				const monitorUuid = message.sender;
 
@@ -61,8 +81,11 @@
 					subject: 'answer',
 					data: answer
 				});
+
+				sendMetaDataUpdate();
 			}
 		});
+
 	});
 </script>
 

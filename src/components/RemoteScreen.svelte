@@ -3,8 +3,10 @@
 	import { VolumeHigh, VolumeMute } from 'svelte-ionicons';
 
 	import ToggleButtonIcon from '$components/ToggleButtonIcon.svelte';
+	import BatteryIndicator from '$components/BatteryIndicator.svelte';
 
 	export let mediaStream: MediaStream;
+	export let batteryStatus: object;
 
 	let localPlayer: HTMLMediaElement;
 
@@ -21,6 +23,8 @@
 	<video bind:this={localPlayer} class="video" autoplay muted></video>
 
 	<div class="video-card__controls">
+		<BatteryIndicator level={batteryStatus.level} charging={batteryStatus.charging} />
+
 		<ToggleButtonIcon
 		  isInitialyEnabled={false}
 			onToggle={(isEnabled: boolean) => toggleAudio(isEnabled)}

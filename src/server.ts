@@ -102,17 +102,18 @@ const server = Bun.serve<ClientData>({
 		message(ws, rawMessage) {
 			const message = JSON.parse(rawMessage.toString());
 
-			if (!clients.has(message.recipient)) {
+			if (message.recipient === 'monitors') {
+				server.publish('monitors', rawMessage);
+			} else if (clients.has(message.recipient)) {
+				const recipient = clients.get(message.recipient);
+				recipient.send(rawMessage);
+			} else {
 				ws.send(
 					JSON.stringify({
 						erro: true
 					})
 				);
 			}
-
-			const recipient = clients.get(message.recipient);
-
-			recipient.send(rawMessage);
 		},
 		close(ws) {
 			if (ws.data.type === 'monitor') {

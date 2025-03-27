@@ -9,6 +9,12 @@
 		uuid: string;
 		connection: RTCPeerConnection;
 		stream?: MediaStream;
+		metaData?: {
+		  batteryStatus: {
+				level: number;
+				charging: boolean;
+			},
+		}
 	};
 
 	let connectedCameras = new SvelteMap<string, ConnectedCamera>();
@@ -73,13 +79,18 @@
 		if (message.subject === 'camera-disconnected') {
 			connectedCameras.delete(message.data.uuid);
 		}
+
+		if (message.subject === 'meta-data') {
+			const camera = connectedCameras.get(message.sender);
+			camera.metaData = message.data;
+		}
 	});
 </script>
 
 {#key connectedCameras}
 	{#each connectedCameras.values() as camera (camera.uuid)}
 		{#if camera.stream}
-			<RemoteScreen mediaStream={camera.stream} />
+			<RemoteScreen mediaStream={camera.stream} batteryStatus={camera.metaData.batteryStatus}/>
 		{/if}
 	{/each}
 {/key}
