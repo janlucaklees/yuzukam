@@ -10,7 +10,7 @@
 		connection: RTCPeerConnection;
 		stream?: MediaStream;
 		metaData?: {
-		  batteryStatus: {
+			batteryStatus: {
 				level: number;
 				charging: boolean;
 			},

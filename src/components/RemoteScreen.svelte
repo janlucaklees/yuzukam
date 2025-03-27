@@ -26,7 +26,7 @@
 		<BatteryIndicator level={batteryStatus.level} charging={batteryStatus.charging} />
 
 		<ToggleButtonIcon
-		  isInitialyEnabled={false}
+			isInitialyEnabled={false}
 			onToggle={(isEnabled: boolean) => toggleAudio(isEnabled)}
 			iconEnabled={VolumeHigh}
 			iconDisabled={VolumeMute}
