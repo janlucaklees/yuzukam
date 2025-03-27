@@ -60,6 +60,23 @@ Bun.serve<ClientData>({
 	websocket: {
 		open(ws) {
 			clients.set(ws.data.uuid, ws);
+
+			if (ws.data.type === 'monitor') {
+				clients
+					.values()
+					.filter((client) => client.data.type === 'camera')
+					.forEach((client) =>
+						ws.send(
+							JSON.stringify({
+								recipient: ws.data.uuid,
+								subject: 'camera-available',
+								data: {
+									uuid: client.data.uuid
+								}
+							})
+						)
+					);
+			}
 		},
 		close(ws) {
 			clients.delete(ws.data.uuid);
