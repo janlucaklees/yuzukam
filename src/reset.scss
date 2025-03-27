@@ -12,6 +12,11 @@ html {
 	text-size-adjust: none;
 }
 
+/* Remove margin from body as it causes scrolling in Chrome */
+body {
+	margin: 0;
+}
+
 /* Remove default margin in favour of better control in authored CSS */
 body,
 h1,
