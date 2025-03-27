@@ -46,6 +46,14 @@
 					}
 				});
 
+				// Handling messages
+				socket.onMessage((message) => {
+					if (message.sender === monitorUuid && message.subject === 'ice-candidate') {
+						console.log('got ice-candidate!');
+						peerConnection.addIceCandidate(message.data);
+					}
+				});
+
 				peerConnection.setRemoteDescription(new RTCSessionDescription(message.data));
 
 				const answer = await peerConnection.createAnswer();
