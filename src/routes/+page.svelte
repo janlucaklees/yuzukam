@@ -3,7 +3,7 @@
 	import { v4 as uuidv4 } from 'uuid';
 
 	import JsonSocket from '$lib/JsonSocket';
-	import Screen from '$components/Screen.svelte';
+	import RemoteScreen from '$components/RemoteScreen.svelte';
 
 	type ConnectedCamera = {
 		uuid: string;
@@ -88,7 +88,7 @@
 {#key connectedCameras}
 	{#each connectedCameras.values() as camera (camera.uuid)}
 		{#if camera.stream}
-			<Screen mediaStream={camera.stream} />
+			<RemoteScreen mediaStream={camera.stream} />
 		{/if}
 	{/each}
 {/key}

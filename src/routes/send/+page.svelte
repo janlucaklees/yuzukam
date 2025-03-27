@@ -3,7 +3,7 @@
 	import { v4 as uuidv4 } from 'uuid';
 
 	import JsonSocket from '$lib/JsonSocket';
-	import Screen from '$components/Screen.svelte';
+	import LocalScreen from '$components/LocalScreen.svelte';
 
 	let stream: MediaStream | undefined;
 
@@ -72,7 +72,7 @@
 </script>
 
 {#if stream}
-	<Screen mediaStream={stream} />
+	<LocalScreen mediaStream={stream} />
 {/if}
 
 <style lang="scss">

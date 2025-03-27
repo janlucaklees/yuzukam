@@ -3,8 +3,9 @@
 	export let iconDisabled;
 
 	export let onToggle: CallableFunction = () => {};
+	export let isInitialyEnabled = true;
 
-	let isEnabled = true;
+	let isEnabled = isInitialyEnabled;
 
 	function toggle() {
 		isEnabled = !isEnabled;
