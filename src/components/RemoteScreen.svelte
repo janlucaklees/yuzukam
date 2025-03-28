@@ -11,7 +11,7 @@
 	let localPlayer: HTMLMediaElement;
 
 	function toggleAudio(isEnabled: boolean) {
-	 localPlayer.muted = !isEnabled;
+		localPlayer.muted = !isEnabled;
 	}
 
 	onMount(() => {
