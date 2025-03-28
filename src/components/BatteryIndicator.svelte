@@ -1,9 +1,23 @@
 <script lang="ts">
 	export let level: number;
 	export let charging: boolean;
+
+	function getBatteryLevelClass(level: number) {
+		if (level <= 0.05) {
+			return 'battery-indicator--danger';
+		}
+
+		if (level <= 0.15) {
+			return 'battery-indicator--critical';
+		}
+
+		if (level <= 0.3) {
+			return 'battery-indicator--warning';
+		}
+	}
 </script>
 
-<div class="battery-indicator">
+<div class="battery-indicator {getBatteryLevelClass(level)}">
 	{#if charging}
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 			<path
@@ -69,9 +83,24 @@
 		svg {
 			width: 24px;
 			height: 24px;
+		}
 
-			fill: green;
-			stroke: green;
+		fill: green;
+		stroke: green;
+
+		&--warning {
+			fill: orange;
+			stroke: orange;
+		}
+
+		&--critical {
+			fill: red;
+			stroke: red;
+		}
+
+		&--danger {
+			fill: darkred;
+			stroke: darkred;
 		}
 	}
 </style>
