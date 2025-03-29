@@ -29,7 +29,7 @@
 				data: {
 					batteryStatus: {
 						level: battery.level,
-						charging: battery.charging,
+						charging: battery.charging
 					}
 				}
 			});
@@ -37,9 +37,9 @@
 
 		socket.connect().then(() => {
 			sendMetaDataUpdate();
-			battery.addEventListener("chargingchange", (event) => sendMetaDataUpdate());
-			battery.addEventListener("levelchange", (event) => sendMetaDataUpdate());
-		})
+			battery.addEventListener('chargingchange', (event) => sendMetaDataUpdate());
+			battery.addEventListener('levelchange', (event) => sendMetaDataUpdate());
+		});
 		socket.onMessage(async (message) => {
 			if (message.subject === 'offer') {
 				const monitorUuid = message.sender;
@@ -85,7 +85,6 @@
 				sendMetaDataUpdate();
 			}
 		});
-
 	});
 </script>
 

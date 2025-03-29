@@ -13,8 +13,8 @@
 			batteryStatus: {
 				level: number;
 				charging: boolean;
-			},
-		}
+			};
+		};
 	};
 
 	let connectedCameras = new SvelteMap<string, ConnectedCamera>();
@@ -90,7 +90,7 @@
 {#key connectedCameras}
 	{#each connectedCameras.values() as camera (camera.uuid)}
 		{#if camera.stream}
-			<RemoteScreen mediaStream={camera.stream} batteryStatus={camera.metaData.batteryStatus}/>
+			<RemoteScreen mediaStream={camera.stream} batteryStatus={camera.metaData.batteryStatus} />
 		{/if}
 	{/each}
 {/key}
