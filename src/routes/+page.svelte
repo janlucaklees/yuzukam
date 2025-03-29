@@ -22,7 +22,7 @@
 	const uuid = uuidv4();
 
 	const socket = new JsonSocket(
-		`ws://${location.hostname}:3000/api/connect?type=monitor&uuid=${uuid}`
+		`ws://${location.hostname}:${location.port}/api/connect?type=monitor&uuid=${uuid}`
 	);
 	socket.connect();
 	socket.onMessage(async (message) => {

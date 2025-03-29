@@ -18,7 +18,7 @@
 		const battery = await navigator.getBattery();
 
 		const socket = new JsonSocket(
-			`ws://${location.hostname}:3000/api/connect?type=camera&uuid=${uuid}`
+			`ws://${location.hostname}:${location.port}/api/connect?type=camera&uuid=${uuid}`
 		);
 
 		function sendMetaDataUpdate() {

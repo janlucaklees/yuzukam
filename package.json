@@ -4,7 +4,9 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "bun run dev:server & bun run dev:sveltekit",
+		"dev:server": "bun run --watch ./src-server/server.ts",
+		"dev:sveltekit": "vite --host 0.0.0.0 dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
