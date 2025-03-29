@@ -32,6 +32,8 @@
 				connection: new RTCPeerConnection()
 			});
 
+			connectedCameras.set(camera.uuid, camera);
+
 			// We need to state that we want to receive video, without sending.
 			camera.connection.addTransceiver('video', { direction: 'recvonly' });
 			camera.connection.addTransceiver('audio', { direction: 'recvonly' });
@@ -72,8 +74,6 @@
 				subject: 'offer',
 				data: offer
 			});
-
-			connectedCameras.set(camera.uuid, camera);
 		}
 
 		if (message.subject === 'camera-disconnected') {
