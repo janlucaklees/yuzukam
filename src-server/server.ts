@@ -1,17 +1,15 @@
-import { argv, type ServerWebSocket } from 'bun';
+import { type ServerWebSocket } from 'bun';
 import { validate as isValidUuid } from 'uuid';
 
 const PORT = 3000;
 
-type ClientType = 'camera' | 'monitor';
 type ClientData = {
-	type: ClientType;
 	uuid: string;
 };
 
 const clients = new Map<string, ServerWebSocket<ClientData>>();
 
-const server = Bun.serve<ClientData>({
+Bun.serve<ClientData>({
 	port: PORT,
 	hostname: '0.0.0.0',
 	fetch(req, server) {
@@ -22,16 +20,7 @@ const server = Bun.serve<ClientData>({
 		console.log(`[${timestamp}] ${clientIP} accessed ${url.pathname}`);
 
 		if (url.pathname === '/api/connect') {
-			const type = url.searchParams.get('type');
 			const uuid = url.searchParams.get('uuid');
-
-			if (type === null) {
-				return new Response('No type given.', { status: 400 });
-			}
-
-			if (!['camera', 'monitor'].includes(type)) {
-				return new Response('Invalid type.', { status: 400 });
-			}
 
 			if (uuid === null) {
 				return new Response('No uuid given.', { status: 400 });
@@ -43,8 +32,7 @@ const server = Bun.serve<ClientData>({
 
 			const wasUpgradeSuccessful = server.upgrade(req, {
 				data: {
-					uuid: url.searchParams.get('uuid'),
-					type: url.searchParams.get('type')
+					uuid: url.searchParams.get('uuid')
 				}
 			});
 
@@ -59,82 +47,37 @@ const server = Bun.serve<ClientData>({
 	},
 	websocket: {
 		open(ws) {
+			// Close any open connection for the same client.
+			const currentConnection = clients.get(ws.data.uuid);
+			if (currentConnection) {
+				currentConnection.close(4499, 'Connection closed: New client connection established.');
+			}
+
 			clients.set(ws.data.uuid, ws);
-
-			if (ws.data.type === 'monitor') {
-				// Add the monitor to the channel with all monitors to communicate
-				// connection and disconnection of cameras.
-				ws.subscribe('monitors');
-
-				// Send the newly connected monitor all available cameras.
-				clients
-					.values()
-					.filter((client) => client.data.type === 'camera')
-					.forEach((client) =>
-						ws.send(
-							JSON.stringify({
-								sender: 'system',
-								recipient: ws.data.uuid,
-								subject: 'camera-connected',
-								data: {
-									uuid: client.data.uuid
-								}
-							})
-						)
-					);
-			}
-
-			if (ws.data.type === 'camera') {
-				// Notify all monitors, that there is a new camera.
-				server.publish(
-					'monitors',
-					JSON.stringify({
-						sender: 'system',
-						recipient: 'all',
-						subject: 'camera-connected',
-						data: {
-							uuid: ws.data.uuid
-						}
-					})
-				);
-			}
+			ws.subscribe('general');
 		},
 		message(ws, rawMessage) {
 			const message = JSON.parse(rawMessage.toString());
 
-			if (message.recipient === 'monitors') {
-				server.publish('monitors', rawMessage);
-			} else if (clients.has(message.recipient)) {
-				const recipient = clients.get(message.recipient);
-				recipient.send(rawMessage);
-			} else {
+			// Broadcast, if special 'all' recipient was used.
+			if (message.recipient === 'all') {
+				ws.publish('general', rawMessage);
+				return;
+			}
+
+			// Return error when recipient was not found.
+			if (!clients.has(message.recipient)) {
 				ws.send(
 					JSON.stringify({
-						erro: true
+						error: 'Invalid Recipient.'
 					})
 				);
 			}
+
+			clients.get(message.recipient)!.send(rawMessage);
 		},
 		close(ws) {
-			if (ws.data.type === 'monitor') {
-				ws.unsubscribe('monitors');
-			}
-
-			if (ws.data.type === 'camera') {
-				// Notify all monitors, that a camera disconnected.
-				server.publish(
-					'monitors',
-					JSON.stringify({
-						sender: 'system',
-						recipient: 'all',
-						subject: 'camera-disconnected',
-						data: {
-							uuid: ws.data.uuid
-						}
-					})
-				);
-			}
-
+			ws.unsubscribe('general');
 			clients.delete(ws.data.uuid);
 		}
 	}
