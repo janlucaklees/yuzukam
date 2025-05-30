@@ -6,6 +6,8 @@
 	import ConnectionManager from '$lib/ConnectionManager';
 	import createPersistentRune from '$stores/persistentStore';
 	import { type ClientType, type ClientMetadata } from '$types/ClientMetadata';
+	import BatteryService from '$lib/BatteryService';
+	import BatteryIndicator from '$components/BatteryIndicator.svelte';
 
 	//
 	// Get settings from the local storage.
@@ -18,34 +20,48 @@
 	let localStream: MediaStream | undefined;
 	const remoteStreams = new SvelteMap<string, MediaStream>();
 	const remotePeers = new SvelteMap<string, ClientMetadata>();
-	const manager = new ConnectionManager({
-		uuid: $uuid,
-		type: $type,
-		name: $name
-	});
 
 	//
 	// Init Code
 	onMount(async () => {
+		// Try getting battery metadata (only works in Chrome).
+		const batteryService = await BatteryService.init();
+
+		// Create the connection manager.
+		const manager = new ConnectionManager({
+			uuid: $uuid,
+			type: $type,
+			name: $name,
+			battery: batteryService.getMetadata()
+		});
+
 		// Add all incoming remote streams to the reactive map, so they are displayed.
 		manager.on('remote-stream', (peerUuid, stream) => remoteStreams.set(peerUuid, stream));
 		manager.on('remote-peer', (peerUuid, metadata) => remotePeers.set(peerUuid, metadata));
 
 		// Connect to all other peers by checking the type setting and proceeding accordingly.
-		toggleLocalStream();
+		toggleLocalStream(manager);
 
 		// Listen to changes to the client type and resetup all peer connections.
 		type.subscribe(() => {
-			toggleLocalStream();
+			toggleLocalStream(manager);
 		});
+
+		// Send metadata updates to all clients
 		name.subscribe(() => {
 			manager.setMetadata({ name: $name });
+		});
+		batteryService.on('levelchange', () => {
+			manager.setMetadata({ battery: batteryService.getMetadata() });
+		});
+		batteryService.on('chargingchange', () => {
+			manager.setMetadata({ battery: batteryService.getMetadata() });
 		});
 	});
 
 	//
 	// Defining functions
-	async function toggleLocalStream() {
+	async function toggleLocalStream(manager: ConnectionManager) {
 		// TODO: Add debounce / mutex.
 		if ($type === 'camera') {
 			// Get the camera and mic stream.
@@ -101,5 +117,12 @@ Peers:
 	Name: {peerMetadata.name}
 	{#if $type === 'monitor' && remoteStreams.has(peerUuid)}
 		<Screen mediaStream={remoteStreams.get(peerUuid)!} />
+
+		{#if peerMetadata.battery}
+			<BatteryIndicator
+				level={peerMetadata.battery.level}
+				charging={peerMetadata.battery.isCharging}
+			/>
+		{/if}
 	{/if}
 {/each}
