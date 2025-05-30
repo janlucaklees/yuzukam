@@ -1,5 +1,5 @@
 import SignalingSocket from '$lib/SignalingSocket';
-import { type MessageTypeMap } from '$types/MessageType';
+import { type SignalingEventMap } from '$types/SignalingEventMap';
 
 export default class SignalingChannel {
 	private isClosed = false;
@@ -9,7 +9,10 @@ export default class SignalingChannel {
 		private readonly peerUuid: string
 	) {}
 
-	public sendMessage<K extends keyof MessageTypeMap>(subject: K, payload) {
+	public sendMessage<K extends keyof SignalingEventMap>(
+		subject: K,
+		payload: SignalingEventMap[K]['payload']
+	) {
 		if (this.isClosed) {
 			throw new Error('Channel Closed.');
 		}
@@ -17,9 +20,9 @@ export default class SignalingChannel {
 		this.socket.sendMessage(this.peerUuid, subject, payload);
 	}
 
-	public onMessage<K extends keyof MessageTypeMap>(
+	public onMessage<K extends keyof SignalingEventMap>(
 		subject: K,
-		callback: (message: MessageTypeMap[K]) => void
+		callback: (message: SignalingEventMap[K]) => void
 	) {
 		this.socket.onMessage(subject, (message) => {
 			if (this.isClosed) {

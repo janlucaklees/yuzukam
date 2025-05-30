@@ -1,9 +1,10 @@
-import { type MessageType, type MessageTypeMap } from '$types/MessageType';
+import { type SignalingEventMap } from '$types/SignalingEventMap';
 import SignalingChannel from '$lib/SignalingChannel';
 
-type Listener<K extends keyof WebSocketEventMap> = {
-	type: K;
-	callback: (event: WebSocketEventMap[K]) => void;
+// Keeping this generic, so I keep my sanity.
+type Listener = {
+	type: string;
+	callback: CallableFunction;
 };
 
 export default class SignalingSocket {
@@ -11,9 +12,9 @@ export default class SignalingSocket {
 	private endpoint: string;
 	private socket: WebSocket;
 
-	private messageQueue: MessageType<keyof MessageTypeMap>[] = [];
+	private messageQueue: SignalingEventMap[keyof SignalingEventMap][] = [];
 
-	private listeners: Listener<keyof WebSocketEventMap>[] = [];
+	private listeners: Listener[] = [];
 
 	constructor(uuid: string) {
 		this.clientUuid = uuid;
@@ -43,7 +44,7 @@ export default class SignalingSocket {
 
 		// Reapply cached listeners on new socket
 		this.listeners.forEach(({ type, callback }) => {
-			socket.addEventListener(type, callback);
+			socket.addEventListener(type, callback as EventListenerOrEventListenerObject);
 		});
 
 		return socket;
@@ -56,13 +57,17 @@ export default class SignalingSocket {
 		}, 3000);
 	}
 
-	public sendMessage<K extends keyof MessageTypeMap>(recipient: string, subject: K, payload) {
-		const message: MessageType<K> = {
+	public sendMessage<K extends keyof SignalingEventMap>(
+		recipient: string,
+		subject: K,
+		payload: SignalingEventMap[K]['payload']
+	) {
+		const message = {
 			sender: this.clientUuid,
 			recipient,
 			subject,
 			payload
-		};
+		} as SignalingEventMap[K];
 
 		if (this.socket.readyState !== WebSocket.OPEN) {
 			this.messageQueue.push(message);
@@ -72,9 +77,9 @@ export default class SignalingSocket {
 		this.socket.send(JSON.stringify(message));
 	}
 
-	public onMessage<K extends keyof MessageTypeMap>(
+	public onMessage<K extends keyof SignalingEventMap>(
 		subject: K,
-		callback: (message: MessageTypeMap[K]) => void
+		callback: (message: SignalingEventMap[K]) => void
 	) {
 		const preparedCallback = (event: WebSocketEventMap['message']) => {
 			const message = JSON.parse(event.data);

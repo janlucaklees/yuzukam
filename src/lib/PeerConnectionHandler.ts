@@ -51,13 +51,18 @@ export default class PeerConnectionHandler {
 		this.bufferedIceCandidates = [];
 	}
 
-	public addStream(stream: MediaStream) {
+	public setToReceive() {
+		this.connection.addTransceiver('video', { direction: 'recvonly' });
+		this.connection.addTransceiver('audio', { direction: 'recvonly' });
+	}
+
+	public setToTransceive(stream: MediaStream) {
 		for (const track of stream.getTracks()) {
 			this.connection.addTrack(track, stream);
 		}
 	}
 
-	public onStream(callback: (stream: MediaStream) => void) {
+	public onRemoteStream(callback: (stream: MediaStream) => void) {
 		this.connection.addEventListener('track', ({ track, streams }) => {
 			track.addEventListener('unmute', () => {
 				callback(streams[0]);
