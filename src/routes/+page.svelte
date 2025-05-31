@@ -48,6 +48,7 @@
 		// Listen to changes to the client type and resetup all peer connections.
 		type.subscribe(() => {
 			toggleLocalStream(manager);
+			manager.setMetadata({ type: $type });
 		});
 
 		// Send metadata updates to all clients
