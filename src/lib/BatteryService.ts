@@ -41,7 +41,13 @@ export default class BatteryService {
 	}
 
 	public static async init() {
-		const battery = (await navigator.getBattery()) as BatteryManager;
+		let battery;
+		try {
+			battery = (await navigator.getBattery()) as BatteryManager;
+		} catch (error) {
+			console.log(error);
+		}
+
 		return new BatteryService(battery);
 	}
 }
