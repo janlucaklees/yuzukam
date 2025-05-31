@@ -4,7 +4,7 @@ type ClientMetadata = {
 	uuid: string;
 	type: ClientType;
 	name: string;
-	battery?: {
+	batteryStatus?: {
 		isCharging: boolean;
 		level: number;
 	};

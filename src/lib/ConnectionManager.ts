@@ -35,7 +35,7 @@ export default class ConnectionManager {
 	}
 
 	public setMetadata(metadata: Partial<ClientMetadata>) {
-		Object.assign(this.metadata, metadata);
+		this.metadata = Object.assign({}, this.metadata, metadata);
 
 		this.socket.sendMessage('all', 'metadata', this.metadata);
 	}

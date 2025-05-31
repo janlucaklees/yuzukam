@@ -71,26 +71,17 @@
 
 <style lang="scss" scoped>
 	.battery-indicator {
-		min-width: 4rem;
-		height: 4rem;
-
-		padding: 0.5em 1em;
-
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
 		svg {
-			width: 24px;
-			height: 24px;
+			width: 18px;
+			height: 18px;
 		}
 
-		fill: green;
-		stroke: green;
+		fill: black;
+		stroke: black;
 
 		&--warning {
-			fill: orange;
-			stroke: orange;
+			fill: black;
+			stroke: black;
 		}
 
 		&--critical {
@@ -99,8 +90,8 @@
 		}
 
 		&--danger {
-			fill: darkred;
-			stroke: darkred;
+			fill: red;
+			stroke: red;
 		}
 	}
 </style>

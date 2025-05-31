@@ -7,13 +7,16 @@
 	import createPersistentRune from '$stores/persistentStore';
 	import { type ClientType, type ClientMetadata } from '$types/ClientMetadata';
 	import BatteryService from '$lib/BatteryService';
-	import BatteryIndicator from '$components/BatteryIndicator.svelte';
+	import { SettingsOutline, TvOutline, VideocamOutline } from 'svelte-ionicons';
+	import ToggleButtonIcon from '$components/ToggleButtonIcon.svelte';
 
 	//
 	// Get settings from the local storage.
 	let uuid = createPersistentRune<string>('uuid', uuidv4());
 	let type = createPersistentRune<ClientType>('type', 'camera');
 	let name = createPersistentRune<string>('name', 'Yuzukam');
+
+	let isMenuOpen = false;
 
 	//
 	// Define global variables
@@ -32,7 +35,7 @@
 			uuid: $uuid,
 			type: $type,
 			name: $name,
-			battery: batteryService.getMetadata()
+			batteryStatus: batteryService.getMetadata()
 		});
 
 		// Add all incoming remote streams to the reactive map, so they are displayed.
@@ -52,10 +55,10 @@
 			manager.setMetadata({ name: $name });
 		});
 		batteryService.on('levelchange', () => {
-			manager.setMetadata({ battery: batteryService.getMetadata() });
+			manager.setMetadata({ batteryStatus: batteryService.getMetadata() });
 		});
 		batteryService.on('chargingchange', () => {
-			manager.setMetadata({ battery: batteryService.getMetadata() });
+			manager.setMetadata({ batteryStatus: batteryService.getMetadata() });
 		});
 	});
 
@@ -88,41 +91,106 @@
 		stream.getTracks().forEach((t) => t.stop());
 		stream.getTracks().forEach((t) => stream.removeTrack(t));
 	}
+
+	function toggleType(isEnabled: boolean) {
+		type.set(isEnabled ? 'camera' : 'monitor');
+	}
 </script>
 
-<div>
-	uuid:{$uuid}
-</div>
-
-<div>
-	type: {$type}
-</div>
-
-<input
-	type="checkbox"
-	checked={$type === 'camera'}
-	on:input={(event) => type.set(event.currentTarget.checked ? 'camera' : 'monitor')}
-/>
-<input type="text" bind:value={$name} />
-
-local stream:
-{#if localStream}
-	<Screen mediaStream={localStream} />
-{/if}
-
-<hr />
-
-Peers:
-{#each remotePeers as [peerUuid, peerMetadata] (peerUuid)}
-	Name: {peerMetadata.name}
-	{#if $type === 'monitor' && remoteStreams.has(peerUuid)}
-		<Screen mediaStream={remoteStreams.get(peerUuid)!} />
-
-		{#if peerMetadata.battery}
-			<BatteryIndicator
-				level={peerMetadata.battery.level}
-				charging={peerMetadata.battery.isCharging}
-			/>
-		{/if}
+<div class="main relative mx-auto flex flex-col px-4 py-4">
+	{#if localStream}
+		<Screen mediaStream={localStream} name="You" class="min-h-0 rounded-lg" />
 	{/if}
-{/each}
+
+	{#if $type === 'camera'}
+		<div class="connected-monitors flex flex-col gap-2">
+			<!-- as a cmaera, we want t list all watching monitor peers. -->
+			{#each remotePeers.values() as peer (peer.uuid)}
+				{#if peer.type === 'monitor'}
+					<div class="monitor bg-pink-200">
+						{peer.name} is watching
+					</div>
+				{/if}
+			{/each}
+		</div>
+	{:else}
+		{#each remotePeers.values() as peer (peer.uuid)}
+			<!-- Only show peers of the opposite type. --->
+			<!-- As a camera I want to know who is watching. -->
+			<!-- As a monitor I want to see all the cameras. -->
+			{#if peer.type !== $type}
+				{#if $type === 'monitor'}
+					<Screen
+						mediaStream={remoteStreams.get(peer.uuid)!}
+						{...peer}
+						class="min-h-0 rounded-lg"
+					/>
+				{:else}
+					<div class="absolute top-2 left-6 rounded-full bg-pink-200 px-3 py-1 text-xs">
+						{peer.name} is watching.
+					</div>
+				{/if}
+			{/if}
+		{/each}
+	{/if}
+</div>
+
+<!-- Menu -->
+<div class="fixed top-0 right-0 flex justify-center">
+	<div class="flex h-14 min-w-14 items-center justify-center rounded-bl-full bg-pink-200">
+		<div class="flex h-14 min-w-14 items-center justify-center pb-3 pl-3">
+			<SettingsOutline onclick={() => (isMenuOpen = !isMenuOpen)} />
+		</div>
+
+		{#if isMenuOpen}
+			<div class="flex h-14 items-center gap-4 bg-gray-200 pr-2 pl-4">
+				<ToggleButtonIcon
+					isInitialyEnabled={$type === 'camera'}
+					onToggle={(isEnabled: boolean) => toggleType(isEnabled)}
+					iconEnabled={VideocamOutline}
+					iconDisabled={TvOutline}
+					size={24}
+					class="bg-transparent"
+				/>
+
+				<div class="flex overflow-clip rounded-lg bg-white outline-pink-200 focus-within:outline">
+					<div class="bg-pink-50 py-2 pr-2 pl-4">Name:</div>
+					<input type="text" class="px-4 py-2 focus:outline-none" bind:value={$name} />
+				</div>
+			</div>
+		{/if}
+	</div>
+</div>
+
+<style lang="scss">
+	@reference 'tailwindcss';
+
+	:root {
+		--max-screen-width: 768px;
+	}
+
+	.main {
+		max-width: var(--max-screen-width);
+		height: 100vh;
+	}
+
+	@media screen and (orientation: landscape) and (max-width: 768px) {
+		.connected-monitors {
+			@apply absolute top-14 left-6;
+
+			.monitor {
+				@apply rounded-full px-3 py-1 text-xs;
+			}
+		}
+	}
+
+	@media screen and (orientation: portrait), (min-width: 769px) {
+		.connected-monitors {
+			@apply mt-2;
+
+			.monitor {
+				@apply rounded-lg px-3 py-1 text-sm;
+			}
+		}
+	}
+</style>

@@ -5,6 +5,11 @@
 	export let onToggle: CallableFunction = () => {};
 	export let isInitialyEnabled = true;
 
+	export let size = 24;
+
+	let clazz = '';
+	export { clazz as class };
+
 	let isEnabled = isInitialyEnabled;
 
 	function toggle() {
@@ -17,32 +22,10 @@
 <button
 	type="button"
 	on:click={toggle}
-	class="button {!isEnabled && 'button--disabled'} rounded border"
+	class="flex h-9 w-9 items-center justify-center rounded-full bg-pink-200 {clazz}"
 >
-	<svelte:component this={isEnabled ? iconEnabled : iconDisabled} />
+	<svelte:component this={isEnabled ? iconEnabled : iconDisabled} {size} />
 </button>
 
-<style lang="scss" scoped>
-	.button {
-		min-width: 4rem;
-		height: 4rem;
-
-		padding: 0.5em 1em;
-
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		background: white;
-
-		font-size: 1.1rem;
-		color: green;
-
-		cursor: pointer;
-	}
-
-	.button--disabled {
-		filter: saturate(0);
-		opacity: 0.5;
-	}
+<style>
 </style>
