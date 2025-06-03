@@ -43,6 +43,13 @@ Bun.serve<ClientData>({
 			return undefined;
 		}
 
+		if (url.pathname === '/' || url.pathname === '') {
+			return new Response(Bun.file(`./public/index.html`));
+		}
+
+		return new Response(Bun.file(`./public/${url.pathname}`));
+	},
+	error() {
 		return new Response('Not found', { status: 404 });
 	},
 	websocket: {

@@ -1,0 +1,14 @@
+.husky/
+.svelte-kit/
+node_modules/
+public/
+.gitignore
+.lintstagedrc.json
+.prettierignore
+.prettierrc
+docker-compose.yml
+Dockerfile
+eslint.confit.js
+Makefile
+nginx.conf
+README.md
