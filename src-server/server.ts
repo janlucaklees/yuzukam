@@ -14,7 +14,7 @@ Bun.serve<ClientData>({
 	hostname: '0.0.0.0',
 	fetch(req, server) {
 		const url = new URL(req.url);
-		const clientIP = server.requestIP(req)?.address;
+		const clientIP = server.requestIP(req)?.address ?? 'unknown';
 		const timestamp = new Date().toISOString().replace('T', ' ').split('.')[0];
 
 		console.log(`[${timestamp}] ${clientIP} accessed ${url.pathname}`);
