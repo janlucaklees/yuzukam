@@ -86,6 +86,7 @@ Bun.serve<ClientData>({
 						error: 'Invalid Recipient.'
 					})
 				);
+				return;
 			}
 
 			clients.get(message.recipient)!.send(rawMessage);
