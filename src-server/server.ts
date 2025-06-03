@@ -64,7 +64,14 @@ Bun.serve<ClientData>({
 			ws.subscribe('general');
 		},
 		message(ws, rawMessage) {
-			const message = JSON.parse(rawMessage.toString());
+			let message;
+			try {
+				message = JSON.parse(rawMessage.toString());
+			} catch {
+				// Malformed payload
+				ws.send(JSON.stringify({ error: 'Invalid JSON.' }));
+				return;
+			}
 
 			// Broadcast, if special 'all' recipient was used.
 			if (message.recipient === 'all') {
