@@ -23,10 +23,10 @@ export default class ConnectionManager {
 				this.socket.sendMessage(message.sender, 'introduction', this.metadata);
 			}
 
-			this.eventSystem.dispatch('remote-peer', [message.sender, message.payload]);
-
 			// Establish RTCPeerConnection with the peer.
 			this.establishPeerConnection(message.sender);
+
+			this.eventSystem.dispatch('peer-connected', [message.sender, message.payload]);
 		});
 
 		this.socket.onMessage('metadata', (message) => {
