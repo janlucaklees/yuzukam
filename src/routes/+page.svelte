@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { v4 as uuidv4 } from 'uuid';
-	import Screen from '$components/Screen.svelte';
+	import LocalScreen from '$components/LocalScreen.svelte';
+	import RemoteScreen from '$components/RemoteScreen.svelte';
 	import ConnectionManager from '$lib/ConnectionManager';
 	import createPersistentRune from '$stores/persistentStore';
 	import { type ClientType, type ClientMetadata } from '$types/ClientMetadata';
@@ -100,7 +101,7 @@
 
 <div class="main relative mx-auto flex flex-col px-4 py-4">
 	{#if localStream}
-		<Screen mediaStream={localStream} name="You" class="min-h-0 rounded-lg" />
+		<LocalScreen mediaStream={localStream} name="You" class="min-h-0 rounded-lg" />
 	{/if}
 
 	{#if $type === 'camera'}
@@ -121,7 +122,7 @@
 			<!-- As a monitor I want to see all the cameras. -->
 			{#if peer.type !== $type}
 				{#if $type === 'monitor'}
-					<Screen
+					<RemoteScreen
 						mediaStream={remoteStreams.get(peer.uuid)!}
 						{...peer}
 						class="min-h-0 rounded-lg"
