@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { v4 as uuidv4 } from 'uuid';
 	import LocalScreen from '$components/LocalScreen.svelte';
@@ -21,9 +21,11 @@
 
 	//
 	// Define global variables
-	let localStream: MediaStream | undefined;
 	const remoteStreams = new SvelteMap<string, MediaStream>();
 	const remotePeers = new SvelteMap<string, ClientMetadata>();
+
+	let localStream: MediaStream | undefined;
+	let manager: ConnectionManager | undefined;
 
 	//
 	// Init Code
@@ -32,7 +34,7 @@
 		const batteryService = await BatteryService.init();
 
 		// Create the connection manager.
-		const manager = new ConnectionManager({
+		manager = new ConnectionManager({
 			uuid: $uuid,
 			type: $type,
 			name: $name,
@@ -45,25 +47,28 @@
 		manager.on('peer-metadata', (peerUuid, metadata) => remotePeers.set(peerUuid, metadata));
 		manager.on('peer-disconnected', (peerUuid) => remotePeers.delete(peerUuid));
 
-		// Connect to all other peers by checking the type setting and proceeding accordingly.
-		toggleLocalStream(manager);
-
-		// Listen to changes to the client type and resetup all peer connections.
+		// Connect to all other peers by checking the type setting and proceeding accordingly and
+		// listen to changes to the client type and resetup all peer connections.
+		// This works, because the subscribe callback is also triggered initially.
 		type.subscribe(() => {
-			toggleLocalStream(manager);
-			manager.setMetadata({ type: $type });
+			toggleLocalStream(manager!);
+			manager!.setMetadata({ type: $type });
 		});
 
 		// Send metadata updates to all clients
 		name.subscribe(() => {
-			manager.setMetadata({ name: $name });
+			manager!.setMetadata({ name: $name });
 		});
 		batteryService.on('levelchange', () => {
-			manager.setMetadata({ batteryStatus: batteryService.getMetadata() });
+			manager!.setMetadata({ batteryStatus: batteryService.getMetadata() });
 		});
 		batteryService.on('chargingchange', () => {
-			manager.setMetadata({ batteryStatus: batteryService.getMetadata() });
+			manager!.setMetadata({ batteryStatus: batteryService.getMetadata() });
 		});
+	});
+
+	onDestroy(() => {
+		manager?.stop();
 	});
 
 	//

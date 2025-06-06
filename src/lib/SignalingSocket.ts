@@ -34,7 +34,7 @@ export default class SignalingSocket {
 		// Make sure to reconnect when the socket closes.
 		socket.addEventListener('close', (event) => {
 			// But only if it wasn't closed for a good reason.
-			if (event.code === 4499) {
+			if (event.code === 4499 || event.code === 4111) {
 				console.log('Not reconnecting, reason: ', event.reason);
 				return;
 			}
@@ -104,5 +104,9 @@ export default class SignalingSocket {
 	public createChannel(peerUuid: string): SignalingChannel {
 		const channel = new SignalingChannel(this, peerUuid);
 		return channel;
+	}
+
+	public close() {
+		this.socket.close(4111, 'Connection closed: Graceful shutdown.');
 	}
 }

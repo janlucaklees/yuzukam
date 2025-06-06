@@ -68,6 +68,17 @@ export default class ConnectionManager {
 		this.socket.sendMessage('all', 'introduction', this.metadata);
 	}
 
+	public stop() {
+		// Close all peer connections.
+		this.connections.forEach((connection) => connection.close());
+
+		// Close the connection to the signaling server
+		this.socket.close();
+
+		// Discard the media stream.
+		this.stream = undefined;
+	}
+
 	private closeConnection(peerUuid: string) {
 		this.connections.get(peerUuid)?.close();
 	}
