@@ -60,8 +60,22 @@ Bun.serve<ClientData>({
 				currentConnection.close(4499, 'Connection closed: New client connection established.');
 			}
 
+			// Store the client in the client map and subscribe them to the general channel.
 			clients.set(ws.data.uuid, ws);
 			ws.subscribe('general');
+
+			// Notify other clients.
+			ws.publish(
+				'general',
+				JSON.stringify({
+					sender: 'server',
+					recipient: 'all',
+					subject: 'client-connected',
+					payload: {
+						uuid: ws.data.uuid
+					}
+				})
+			);
 		},
 		message(ws, rawMessage) {
 			let message;
@@ -92,8 +106,22 @@ Bun.serve<ClientData>({
 			clients.get(message.recipient)!.send(rawMessage);
 		},
 		close(ws) {
+			// Remove the client from the general channel and the client map.
 			ws.unsubscribe('general');
 			clients.delete(ws.data.uuid);
+
+			// Notify other clients.
+			ws.publish(
+				'general',
+				JSON.stringify({
+					sender: 'server',
+					recipient: 'all',
+					subject: 'client-disconnected',
+					payload: {
+						uuid: ws.data.uuid
+					}
+				})
+			);
 		}
 	}
 });

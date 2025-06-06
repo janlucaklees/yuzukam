@@ -30,7 +30,15 @@ export default class ConnectionManager {
 		});
 
 		this.socket.onMessage('metadata', (message) => {
-			this.eventSystem.dispatch('remote-peer', [message.sender, message.payload]);
+			this.eventSystem.dispatch('peer-metadata', [message.sender, message.payload]);
+		});
+
+		// Listen for incoming introductions from other peers.
+		this.socket.onMessage('client-disconnected', (message) => {
+			this.eventSystem.dispatch('peer-disconnected', [message.payload.uuid]);
+
+			// Establish RTCPeerConnection with the peer.
+			this.closeConnection(message.payload.uuid);
 		});
 	}
 
@@ -60,13 +68,16 @@ export default class ConnectionManager {
 		this.socket.sendMessage('all', 'introduction', this.metadata);
 	}
 
+	private closeConnection(peerUuid: string) {
+		this.connections.get(peerUuid)?.close();
+	}
+
 	private establishPeerConnection(peerUuid: string) {
 		// Clean up any open connections
-		let connection = this.connections.get(peerUuid);
-		connection?.close();
+		this.closeConnection(peerUuid);
 
 		// Create a new connection handler and save it to the list of all handlers.
-		connection = new PeerConnectionHandler(this.socket.createChannel(peerUuid));
+		const connection = new PeerConnectionHandler(this.socket.createChannel(peerUuid));
 		this.connections.set(peerUuid, connection);
 
 		// Set handler mode to either send and receive, or just receive.

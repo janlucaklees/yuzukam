@@ -2,7 +2,9 @@ import { type ClientMetadata } from './ClientMetadata';
 
 interface ConnectionManagerEventMap {
 	'remote-stream': [peerUuid: string, stream: MediaStream];
-	'remote-peer': [peerUuid: string, metadata: ClientMetadata];
+	'peer-connected': [peerUuid: string, metadata: ClientMetadata];
+	'peer-metadata': [peerUuid: string, metadata: ClientMetadata];
+	'peer-disconnected': [peerUuid: string];
 }
 
 export { type ConnectionManagerEventMap };

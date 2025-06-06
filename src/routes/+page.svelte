@@ -41,7 +41,9 @@
 
 		// Add all incoming remote streams to the reactive map, so they are displayed.
 		manager.on('remote-stream', (peerUuid, stream) => remoteStreams.set(peerUuid, stream));
-		manager.on('remote-peer', (peerUuid, metadata) => remotePeers.set(peerUuid, metadata));
+		manager.on('peer-connected', (peerUuid, metadata) => remotePeers.set(peerUuid, metadata));
+		manager.on('peer-metadata', (peerUuid, metadata) => remotePeers.set(peerUuid, metadata));
+		manager.on('peer-disconnected', (peerUuid) => remotePeers.delete(peerUuid));
 
 		// Connect to all other peers by checking the type setting and proceeding accordingly.
 		toggleLocalStream(manager);
