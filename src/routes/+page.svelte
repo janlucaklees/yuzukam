@@ -10,6 +10,7 @@
 	import BatteryService from '$lib/BatteryService';
 	import { SettingsOutline, TvOutline, VideocamOutline } from 'svelte-ionicons';
 	import ToggleButtonIcon from '$components/ToggleButtonIcon.svelte';
+	import UserMediaService from '$lib/UserMediaService';
 
 	//
 	// Get settings from the local storage.
@@ -32,6 +33,7 @@
 	onMount(async () => {
 		// Try getting battery metadata (only works in Chrome).
 		const batteryService = await BatteryService.init();
+		const userMediaService = await UserMediaService.init();
 
 		// Create the connection manager.
 		manager = new ConnectionManager({
@@ -53,6 +55,17 @@
 		type.subscribe(() => {
 			toggleLocalStream(manager!);
 			manager!.setMetadata({ type: $type });
+		});
+
+		// In case the user media service restarts the stream, update the stream in
+		// the connection manager.
+		userMediaService.on('stream-restarted', (stream: MediaStream) => {
+			// Only update the stream if the connection manager had one.
+			// We do not want to enable streaming video and audio, just becuase the
+			// device woke up.
+			if (manager!.hasStream()) {
+				manager!.setStream(stream);
+			}
 		});
 
 		// Send metadata updates to all clients

@@ -2,15 +2,21 @@ import SignalingSocket from '$lib/SignalingSocket';
 import PeerConnectionHandler from '$lib/PeerConnectionHandler';
 import EventSystem from '$lib/EventSystem';
 import type { ClientMetadata } from '$types/ClientMetadata';
-import type { ConnectionManagerEventMap } from '$types/ConnectionManagerEvent';
 import type { Callback } from '$types/Callback';
+
+interface ConnectionManagerEventMap {
+	'remote-stream': [peerUuid: string, stream: MediaStream];
+	'peer-connected': [peerUuid: string, metadata: ClientMetadata];
+	'peer-metadata': [peerUuid: string, metadata: ClientMetadata];
+	'peer-disconnected': [peerUuid: string];
+}
 
 export default class ConnectionManager {
 	private socket: SignalingSocket;
 	private stream: MediaStream | undefined;
 
 	private connections = new Map<string, PeerConnectionHandler>();
-	private eventSystem = new EventSystem();
+	private eventSystem = new EventSystem<ConnectionManagerEventMap>();
 
 	constructor(private metadata: ClientMetadata) {
 		// Create a connection to the signaling server.
@@ -53,6 +59,10 @@ export default class ConnectionManager {
 
 		// Reconnect, to reflect changes to all peers.
 		this.start();
+	}
+
+	public hasStream() {
+		return !!this.stream;
 	}
 
 	public removeStream() {

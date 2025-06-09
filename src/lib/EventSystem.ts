@@ -1,32 +1,23 @@
 import type { Callback } from '$types/Callback';
-import type { ConnectionManagerEventMap } from '$types/ConnectionManagerEvent';
 
-export default class EventSystem {
+export default class EventSystem<EventMap extends Record<keyof EventMap, unknown[]>> {
 	private listeners: {
-		[K in keyof ConnectionManagerEventMap]?: Callback<ConnectionManagerEventMap[K]>[];
+		[K in keyof EventMap]?: Callback<EventMap[K]>[];
 	} = {};
 
-	private getListeners<K extends keyof ConnectionManagerEventMap>(
-		type: K
-	): Callback<ConnectionManagerEventMap[K]>[] {
+	private getListeners<K extends keyof EventMap>(type: K): Callback<EventMap[K]>[] {
 		if (!this.listeners[type]) {
 			this.listeners[type] = [];
 		}
 		return this.listeners[type];
 	}
 
-	on<K extends keyof ConnectionManagerEventMap>(
-		type: K,
-		callback: Callback<ConnectionManagerEventMap[K]>
-	) {
+	on<K extends keyof EventMap>(type: K, callback: Callback<EventMap[K]>) {
 		const typeListeners = this.getListeners(type);
 		typeListeners.push(callback);
 	}
 
-	dispatch<K extends keyof ConnectionManagerEventMap>(
-		type: K,
-		parameters: ConnectionManagerEventMap[K]
-	) {
+	dispatch<K extends keyof EventMap>(type: K, parameters: EventMap[K]) {
 		this.getListeners(type)?.forEach((callback) => callback(...parameters));
 	}
 }
