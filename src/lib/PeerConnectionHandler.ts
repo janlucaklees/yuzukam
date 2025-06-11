@@ -1,6 +1,15 @@
 import SignalingChannel from '$lib/SignalingChannel';
+import EventSystem from '$lib/EventSystem';
+import type { Callback } from '$types/Callback';
+
+interface PeerConnectionHandlerEventMap extends Record<string, unknown[]> {
+	connectionstatechange: [state: RTCPeerConnectionState];
+	stream: [stream: MediaStream];
+}
 
 export default class PeerConnectionHandler {
+	private eventSystem = new EventSystem<PeerConnectionHandlerEventMap>();
+
 	private channel: SignalingChannel;
 	private connection: RTCPeerConnection;
 	private bufferedIceCandidates: RTCIceCandidateInit[] = [];
@@ -42,6 +51,25 @@ export default class PeerConnectionHandler {
 				this.channel.sendMessage('description', answer);
 			}
 		});
+
+		// Listen for incoming streams
+		this.connection.addEventListener('track', ({ track, streams }) => {
+			track.addEventListener('unmute', () => {
+				this.eventSystem.dispatch('stream', [streams[0]]);
+			});
+		});
+
+		// Connection state change listener
+		this.connection.addEventListener('connectionstatechange', () => {
+			this.eventSystem.dispatch('connectionstatechange', [this.connection.connectionState]);
+		});
+	}
+
+	on<K extends keyof PeerConnectionHandlerEventMap>(
+		type: K,
+		callback: Callback<PeerConnectionHandlerEventMap[K]>
+	) {
+		this.eventSystem.on(type, callback);
 	}
 
 	private async setRemoteDescription(description: RTCSessionDescriptionInit) {
@@ -60,14 +88,6 @@ export default class PeerConnectionHandler {
 		for (const track of stream.getTracks()) {
 			this.connection.addTrack(track, stream);
 		}
-	}
-
-	public onRemoteStream(callback: (stream: MediaStream) => void) {
-		this.connection.addEventListener('track', ({ track, streams }) => {
-			track.addEventListener('unmute', () => {
-				callback(streams[0]);
-			});
-		});
 	}
 
 	async call() {

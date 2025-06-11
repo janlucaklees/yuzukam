@@ -7,6 +7,8 @@
 	import PeerConnectionHandler from '$lib/PeerConnectionHandler';
 	import type SignalingChannel from '$lib/SignalingChannel';
 
+	import ConnectionStateIndicator from '$components/ConnectionStateIndicator.svelte';
+
 	//
 	// Props
 	export let peer: ClientMetadata;
@@ -20,12 +22,17 @@
 	// Globals
 	let channel: SignalingChannel | undefined;
 	let connection: PeerConnectionHandler | undefined;
+	let connectionState: RTCPeerConnectionState;
 
 	onMount(() => {
 		channel = socket.createChannel(peer.uuid);
 		connection = new PeerConnectionHandler(channel);
 		connection.setToTransmit(stream);
 		connection.call();
+
+		connection.on('connectionstatechange', (newState) => {
+			connectionState = newState;
+		});
 	});
 
 	onDestroy(() => {
@@ -34,7 +41,9 @@
 	});
 </script>
 
-<div class="monitor bg-pink-200">
+<div class="monitor flex items-center gap-2 bg-pink-200">
+	<ConnectionStateIndicator state={connectionState} />
+
 	{peer.name} is watching
 </div>
 
