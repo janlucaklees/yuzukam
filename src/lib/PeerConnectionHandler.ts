@@ -56,7 +56,7 @@ export default class PeerConnectionHandler {
 		this.connection.addTransceiver('audio', { direction: 'recvonly' });
 	}
 
-	public setToTransceive(stream: MediaStream) {
+	public setToTransmit(stream: MediaStream) {
 		for (const track of stream.getTracks()) {
 			this.connection.addTrack(track, stream);
 		}
@@ -78,7 +78,6 @@ export default class PeerConnectionHandler {
 	}
 
 	close() {
-		this.channel.close();
 		this.connection.close();
 	}
 }

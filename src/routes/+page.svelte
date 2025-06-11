@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { SvelteMap } from 'svelte/reactivity';
-	import { v4 as uuidv4 } from 'uuid';
-	import LocalScreen from '$components/LocalScreen.svelte';
-	import RemoteScreen from '$components/RemoteScreen.svelte';
-	import ConnectionManager from '$lib/ConnectionManager';
-	import createPersistentRune from '$stores/persistentStore';
-	import { type ClientType, type ClientMetadata } from '$types/ClientMetadata';
-	import BatteryService from '$lib/BatteryService';
+	import { onMount, setContext } from 'svelte';
 	import { SettingsOutline, TvOutline, VideocamOutline } from 'svelte-ionicons';
+	import { v4 as uuidv4 } from 'uuid';
+
+	import createPersistentRune from '$stores/persistentStore';
+	import { type ClientMetadata, type ClientType } from '$types/ClientMetadata';
+
 	import ToggleButtonIcon from '$components/ToggleButtonIcon.svelte';
-	import UserMediaService from '$lib/UserMediaService';
+	import Camera from '$components/Camera.svelte';
+	import Monitor from '$components/Monitor.svelte';
+	import SignalingSocket from '$lib/SignalingSocket';
+	import BatteryService from '$lib/BatteryService';
+	import PeerManager from '$lib/PeerManager';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	//
 	// Get settings from the local storage.
@@ -18,201 +20,89 @@
 	let type = createPersistentRune<ClientType>('type', 'camera');
 	let name = createPersistentRune<string>('name', 'Yuzukam');
 
-	let isMenuOpen = false;
+	const peers = new SvelteMap<string, ClientMetadata>();
 
-	//
-	// Define global variables
-	const remoteStreams = new SvelteMap<string, MediaStream>();
-	const remotePeers = new SvelteMap<string, ClientMetadata>();
+	const socket = new SignalingSocket($uuid);
+	setContext('socket', socket);
 
-	let localStream: MediaStream | undefined;
-	let manager: ConnectionManager | undefined;
-
-	//
-	// Init Code
 	onMount(async () => {
-		// Try getting battery metadata (only works in Chrome).
 		const batteryService = await BatteryService.init();
-		const userMediaService = await UserMediaService.init();
-
-		// Create the connection manager.
-		manager = new ConnectionManager({
+		const peerManager = new PeerManager(socket, {
 			uuid: $uuid,
 			type: $type,
 			name: $name,
 			batteryStatus: batteryService.getMetadata()
 		});
 
-		// Add all incoming remote streams to the reactive map, so they are displayed.
-		manager.on('remote-stream', (peerUuid, stream) => remoteStreams.set(peerUuid, stream));
-		manager.on('peer-connected', (peerUuid, metadata) => remotePeers.set(peerUuid, metadata));
-		manager.on('peer-metadata', (peerUuid, metadata) => remotePeers.set(peerUuid, metadata));
-		manager.on('peer-disconnected', (peerUuid) => remotePeers.delete(peerUuid));
+		//
+		// Update peer list
+		// TODO: This is kind of redundant with what the peerManager does.
+		// We don't need to listen to the peer-connected event, as the metadata event is also fired for new peers.
+		peerManager.on('peer-metadata', (peerUuid, metadata) => peers.set(peerUuid, metadata));
+		peerManager.on('peer-disconnected', (peerUuid) => peers.delete(peerUuid));
 
-		// Connect to all other peers by checking the type setting and proceeding accordingly and
-		// listen to changes to the client type and resetup all peer connections.
-		// This works, because the subscribe callback is also triggered initially.
-		type.subscribe(() => {
-			toggleLocalStream(manager!);
-			manager!.setMetadata({ type: $type });
-		});
-
-		// In case the user media service restarts the stream, update the stream in
-		// the connection manager.
-		userMediaService.on('stream-restarted', (stream: MediaStream) => {
-			// Only update the stream if the connection manager had one.
-			// We do not want to enable streaming video and audio, just becuase the
-			// device woke up.
-			if (manager!.hasStream()) {
-				manager!.setStream(stream);
-			}
-		});
-
+		//
 		// Send metadata updates to all clients
+		type.subscribe(() => {
+			peerManager.setMetadata({ type: $type });
+		});
 		name.subscribe(() => {
-			manager!.setMetadata({ name: $name });
+			peerManager.setMetadata({ name: $name });
 		});
 		batteryService.on('levelchange', () => {
-			manager!.setMetadata({ batteryStatus: batteryService.getMetadata() });
+			peerManager.setMetadata({ batteryStatus: batteryService.getMetadata() });
 		});
 		batteryService.on('chargingchange', () => {
-			manager!.setMetadata({ batteryStatus: batteryService.getMetadata() });
+			peerManager.setMetadata({ batteryStatus: batteryService.getMetadata() });
 		});
+
+		//
+		// Connect to other peers
+		peerManager.sendIntroduction();
 	});
 
-	onDestroy(() => {
-		manager?.stop();
-	});
-
-	//
-	// Defining functions
-	async function toggleLocalStream(manager: ConnectionManager) {
-		// TODO: Add debounce / mutex.
-		if ($type === 'camera') {
-			// Get the camera and mic stream.
-			// TODO: Errorhandling; Show message, when media is not accessible.
-			localStream = await navigator.mediaDevices.getUserMedia({
-				video: true,
-				audio: true
-			});
-
-			// Set the stream and reconnect to all peers.
-			manager.setStream(localStream);
-		} else if ($type === 'monitor') {
-			if (localStream) {
-				stopStream(localStream);
-			}
-			localStream = undefined;
-
-			// Remove the stream and reconnects to all peers.
-			manager.removeStream();
-		}
-	}
-
-	function stopStream(stream: MediaStream) {
-		stream.getTracks().forEach((t) => t.stop());
-		stream.getTracks().forEach((t) => stream.removeTrack(t));
-	}
+	let isMenuOpen = false;
 
 	function toggleType(isEnabled: boolean) {
 		type.set(isEnabled ? 'camera' : 'monitor');
 	}
+
+	function filterPeersByType(peers: SvelteMap<string, ClientMetadata>, type: ClientType) {
+		return Array.from(peers.values().filter((peer) => peer.type === type));
+	}
 </script>
 
-<div class="main relative mx-auto flex flex-col px-4 py-4">
-	{#if localStream}
-		<LocalScreen mediaStream={localStream} name="You" class="min-h-0 rounded-lg" />
-	{/if}
+{#if $type === 'camera'}
+	<Camera monitors={filterPeersByType(peers, 'monitor')} />
+{:else}
+	<Monitor cameras={filterPeersByType(peers, 'camera')} />
+{/if}
 
-	{#if $type === 'camera'}
-		<div class="connected-monitors flex flex-col gap-2">
-			<!-- as a cmaera, we want t list all watching monitor peers. -->
-			{#each remotePeers.values() as peer (peer.uuid)}
-				{#if peer.type === 'monitor'}
-					<div class="monitor bg-pink-200">
-						{peer.name} is watching
-					</div>
-				{/if}
-			{/each}
-		</div>
-	{:else}
-		{#each remotePeers.values() as peer (peer.uuid)}
-			<!-- Only show peers of the opposite type. --->
-			<!-- As a camera I want to know who is watching. -->
-			<!-- As a monitor I want to see all the cameras. -->
-			{#if peer.type !== $type}
-				{#if $type === 'monitor'}
-					<RemoteScreen
-						mediaStream={remoteStreams.get(peer.uuid)!}
-						{...peer}
-						class="min-h-0 rounded-lg"
-					/>
-				{:else}
-					<div class="absolute top-2 left-6 rounded-full bg-pink-200 px-3 py-1 text-xs">
-						{peer.name} is watching.
-					</div>
-				{/if}
-			{/if}
-		{/each}
-	{/if}
-</div>
-
-<!-- Menu -->
-<div class="fixed top-0 right-0 flex justify-center">
-	<div class="flex h-14 min-w-14 items-center justify-center rounded-bl-full bg-pink-200">
-		<div class="flex h-14 min-w-14 items-center justify-center pb-3 pl-3">
-			<SettingsOutline onclick={() => (isMenuOpen = !isMenuOpen)} />
-		</div>
-
-		{#if isMenuOpen}
-			<div class="flex h-14 items-center gap-4 bg-gray-200 pr-2 pl-4">
-				<ToggleButtonIcon
-					isInitialyEnabled={$type === 'camera'}
-					onToggle={(isEnabled: boolean) => toggleType(isEnabled)}
-					iconEnabled={VideocamOutline}
-					iconDisabled={TvOutline}
-					size={24}
-					class="bg-transparent"
-				/>
-
-				<div class="flex overflow-clip rounded-lg bg-white outline-pink-200 focus-within:outline">
-					<div class="bg-pink-50 py-2 pr-2 pl-4">Name:</div>
-					<input type="text" class="px-4 py-2 focus:outline-none" bind:value={$name} />
-				</div>
-			</div>
-		{/if}
+<!-- Settings -->
+<div class="fixed top-0 right-0 flex w-screen justify-end">
+	<div
+		class="flex h-14 w-14 flex-none items-center justify-center rounded-bl-full bg-pink-200 pb-3 pl-3"
+	>
+		<SettingsOutline onclick={() => (isMenuOpen = !isMenuOpen)} />
 	</div>
+
+	{#if isMenuOpen}
+		<div class="flex h-14 min-w-0 shrink items-center gap-4 bg-gray-200 pr-2 pl-4">
+			<ToggleButtonIcon
+				isInitialyEnabled={$type === 'camera'}
+				onToggle={(isEnabled: boolean) => toggleType(isEnabled)}
+				iconEnabled={VideocamOutline}
+				iconDisabled={TvOutline}
+				size={24}
+				class="flex-none !bg-pink-100"
+			/>
+
+			<div
+				class="flex min-w-0 shrink overflow-clip rounded-lg bg-white outline-pink-200 focus-within:outline"
+			>
+				<div class="bg-pink-50 py-2 pr-2 pl-4">Name:</div>
+				<input type="text" class="min-w-0 shrink px-4 py-2 focus:outline-none" bind:value={$name} />
+			</div>
+		</div>
+	{/if}
 </div>
-
-<style lang="scss">
-	@reference 'tailwindcss';
-
-	:root {
-		--max-screen-width: 768px;
-	}
-
-	.main {
-		max-width: var(--max-screen-width);
-		height: 100vh;
-	}
-
-	@media screen and (orientation: landscape) and (max-width: 768px) {
-		.connected-monitors {
-			@apply absolute top-14 left-6;
-
-			.monitor {
-				@apply rounded-full px-3 py-1 text-xs;
-			}
-		}
-	}
-
-	@media screen and (orientation: portrait), (min-width: 769px) {
-		.connected-monitors {
-			@apply mt-2;
-
-			.monitor {
-				@apply rounded-lg px-3 py-1 text-sm;
-			}
-		}
-	}
-</style>

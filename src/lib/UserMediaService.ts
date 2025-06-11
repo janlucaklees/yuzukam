@@ -1,23 +1,41 @@
 import { type Callback } from '$types/Callback';
-import EventSystem from './EventSystem';
+import EventSystem from '$lib/EventSystem';
 
 interface UserMediaServiceEventMap extends Record<string, unknown[]> {
-	'stream-restarted': [stream: MediaStream];
+	stream: [stream: MediaStream];
 }
 
 export default class UserMediaService {
 	private eventSystem = new EventSystem<UserMediaServiceEventMap>();
+	private stream: MediaStream | undefined;
 
 	constructor(
-		private readonly constraints: MediaStreamConstraints | undefined,
-		private stream: MediaStream | undefined
+		private readonly constraints: MediaStreamConstraints = {
+			video: true,
+			audio: true
+		}
 	) {
-		this.stream?.getTracks().forEach((track) =>
+		this.restartStream();
+	}
+
+	private async restartStream() {
+		// Stop old stream
+		this.ensureStreamStopped(this.stream);
+
+		// Get and set new stream
+		this.stream = await navigator.mediaDevices.getUserMedia(this.constraints);
+
+		// Register listener to restart stream, if stopped.
+		this.stream.getTracks().forEach((track) =>
 			track.addEventListener('ended', async () => {
-				this.stream = await UserMediaService.getStream(this.constraints);
-				this.eventSystem.dispatch('stream-restarted', [this.stream]);
+				console.log('Restarting local camera feed...');
+
+				this.restartStream();
 			})
 		);
+
+		// Notify listeners
+		this.eventSystem.dispatch('stream', [this.stream]);
 	}
 
 	on<K extends keyof UserMediaServiceEventMap>(
@@ -27,23 +45,16 @@ export default class UserMediaService {
 		this.eventSystem.on(type, callback);
 	}
 
-	private static getStream(
-		constraints: MediaStreamConstraints = {
-			video: true,
-			audio: true
+	private ensureStreamStopped(stream: MediaStream | undefined) {
+		if (!stream) {
+			return;
 		}
-	) {
-		return navigator.mediaDevices.getUserMedia(constraints);
+
+		stream.getTracks().forEach((t) => t.stop());
+		stream.getTracks().forEach((t) => stream.removeTrack(t));
 	}
 
-	public static async init(constraints?: MediaStreamConstraints) {
-		let mediaStream;
-		try {
-			mediaStream = await UserMediaService.getStream(constraints);
-		} catch (error) {
-			console.log(error);
-		}
-
-		return new UserMediaService(constraints, mediaStream);
+	public destroy() {
+		this.ensureStreamStopped(this.stream);
 	}
 }

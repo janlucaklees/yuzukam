@@ -45,6 +45,7 @@ export default class BatteryService {
 		try {
 			battery = (await navigator.getBattery()) as BatteryManager;
 		} catch (error) {
+			// TODO: Improved error handling.
 			console.log(error);
 		}
 
