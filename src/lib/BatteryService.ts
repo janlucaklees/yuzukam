@@ -17,7 +17,7 @@ interface BatteryManagerEventMap {
 export default class BatteryService {
 	constructor(private readonly batteryManager: BatteryManager | undefined) {}
 
-	getMetadata(): ClientMetadata['battery'] {
+	getMetadata(): ClientMetadata['batteryStatus'] {
 		if (!this.batteryManager) {
 			return undefined;
 		}
