@@ -52,7 +52,7 @@
 
 	@media screen and (orientation: landscape) and (max-width: 768px) {
 		.monitor {
-			@apply rounded-full px-3 py-1 text-xs;
+			@apply rounded-full py-1 pr-3 pl-2 text-xs;
 		}
 	}
 

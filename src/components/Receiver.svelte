@@ -80,7 +80,7 @@
 		{/if}
 
 		<div
-			class="absolute top-2 left-2 flex items-center gap-2 rounded-full bg-pink-200 px-3 py-1 text-xs"
+			class="absolute top-2 left-2 flex items-center gap-2 rounded-full bg-pink-200 py-1 pr-3 pl-2 text-xs"
 		>
 			<ConnectionStateIndicator state={connectionState} />
 
