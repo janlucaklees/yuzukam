@@ -37,7 +37,7 @@
 	{/if}
 </div>
 
-<style lang="scss">
+<style>
 	@reference 'tailwindcss';
 
 	:root {

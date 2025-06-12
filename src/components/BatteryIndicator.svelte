@@ -69,7 +69,7 @@
 	{/if}
 </div>
 
-<style lang="scss" scoped>
+<style scoped>
 	.battery-indicator {
 		svg {
 			width: 18px;

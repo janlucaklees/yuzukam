@@ -47,7 +47,7 @@
 	{peer.name} is watching
 </div>
 
-<style lang="scss">
+<style>
 	@reference 'tailwindcss';
 
 	@media screen and (orientation: landscape) and (max-width: 768px) {
