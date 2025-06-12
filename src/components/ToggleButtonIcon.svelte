@@ -22,7 +22,7 @@
 <button
 	type="button"
 	on:click={toggle}
-	class="flex h-9 w-9 items-center justify-center rounded-full bg-pink-200 {clazz}"
+	class="flex h-9 w-9 items-center justify-center rounded-full bg-yellow-200 {clazz}"
 >
 	<svelte:component this={isEnabled ? iconEnabled : iconDisabled} {size} />
 </button>

@@ -41,7 +41,7 @@
 	});
 </script>
 
-<div class="monitor flex items-center gap-2 bg-pink-200">
+<div class="monitor flex items-center gap-2 bg-yellow-200">
 	<ConnectionStateIndicator state={connectionState} />
 
 	{peer.name} is watching

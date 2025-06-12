@@ -81,26 +81,26 @@
 <!-- Settings -->
 <div class="fixed top-0 right-0 flex w-screen justify-end">
 	<div
-		class="flex h-14 w-14 flex-none items-center justify-center rounded-bl-full bg-pink-200 pb-3 pl-3"
+		class="flex h-14 w-14 flex-none items-center justify-center rounded-bl-full bg-yellow-200 pb-3 pl-3"
 	>
 		<SettingsOutline onclick={() => (isMenuOpen = !isMenuOpen)} />
 	</div>
 
 	{#if isMenuOpen}
-		<div class="flex h-14 min-w-0 shrink items-center gap-4 bg-gray-200 pr-2 pl-4">
+		<div class="flex h-14 min-w-0 shrink items-center gap-4 bg-gray-300 pr-2 pl-4">
 			<ToggleButtonIcon
 				isInitialyEnabled={$type === 'camera'}
 				onToggle={(isEnabled: boolean) => toggleType(isEnabled)}
 				iconEnabled={VideocamOutline}
 				iconDisabled={TvOutline}
 				size={24}
-				class="flex-none !bg-pink-100"
+				class="flex-none !bg-yellow-200"
 			/>
 
 			<div
-				class="flex min-w-0 shrink overflow-clip rounded-lg bg-white outline-pink-200 focus-within:outline"
+				class="flex min-w-0 shrink overflow-clip rounded-lg bg-white outline-yellow-400 focus-within:outline-4"
 			>
-				<div class="bg-pink-50 py-2 pr-2 pl-4">Name:</div>
+				<div class="bg-yellow-200 py-2 pr-2 pl-4">Name:</div>
 				<input type="text" class="min-w-0 shrink px-4 py-2 focus:outline-none" bind:value={$name} />
 			</div>
 		</div>

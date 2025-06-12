@@ -1,1 +1,29 @@
 @import 'tailwindcss';
+
+@theme {
+	/* --color-yellow: oklch(0.9103 0.1144 95.04); */
+
+	--color-yellow-50: oklch(0.99 0.03 95.04);
+	--color-yellow-100: oklch(0.97 0.06 95.04);
+	--color-yellow-200: oklch(0.94 0.09 95.04);
+	--color-yellow-300: oklch(0.91 0.114 95.04); /* reference */
+	--color-yellow-400: oklch(0.86 0.11 95.04);
+	--color-yellow-500: oklch(0.8 0.1 95.04);
+	--color-yellow-600: oklch(0.7 0.09 95.04);
+	--color-yellow-700: oklch(0.58 0.075 95.04);
+	--color-yellow-800: oklch(0.47 0.06 95.04);
+	--color-yellow-900: oklch(0.38 0.045 95.04);
+	--color-yellow-950: oklch(0.26 0.03 95.04);
+}
+
+:root {
+	font-family: 'Chewy', system-ui;
+	font-weight: 400;
+	font-style: normal;
+
+	@apply text-gray-800;
+}
+
+body {
+	background-color: #fcfaf2;
+}
