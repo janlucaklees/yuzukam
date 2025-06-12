@@ -26,9 +26,9 @@
 </script>
 
 <div class="main relative mx-auto flex flex-col px-4 py-4">
-	{#if stream}
-		<LocalScreen mediaStream={stream} name="You" class="min-h-0 rounded-lg" />
+	<LocalScreen mediaStream={stream} name="You" />
 
+	{#if stream}
 		<div class="connected-monitors flex flex-col gap-2">
 			{#each monitors as peer (peer.uuid)}
 				<Transmitter {peer} {stream} />

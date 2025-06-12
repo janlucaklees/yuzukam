@@ -11,6 +11,7 @@
 	import BatteryIndicator from '$components/BatteryIndicator.svelte';
 	import ToggleButtonIcon from '$components/ToggleButtonIcon.svelte';
 	import ConnectionStateIndicator from '$components/ConnectionStateIndicator.svelte';
+	import Screen from './Screen.svelte';
 
 	//
 	// Props
@@ -27,7 +28,7 @@
 	let connectionState: RTCPeerConnectionState;
 	let remoteStream: MediaStream | undefined;
 	let isMuted = true;
-	let rootElement: HTMLElement;
+	let screen: HTMLElement;
 
 	onMount(() => {
 		channel = socket.createChannel(peer.uuid);
@@ -48,69 +49,43 @@
 		channel?.close();
 	});
 
+	function toggleAudio(isEnabled: boolean) {
+		isMuted = !isEnabled;
+	}
+
 	function toggleFullscreen(isEnabled: boolean) {
 		if (isEnabled) {
-			rootElement.requestFullscreen();
+			screen.requestFullscreen();
 		} else {
 			document.exitFullscreen();
 		}
 	}
-
-	function srcObject(node: HTMLVideoElement, stream: MediaStream) {
-		node.srcObject = stream;
-		return {
-			update(nextStream: MediaStream) {
-				node.srcObject = nextStream;
-			}
-		};
-	}
 </script>
 
-{#if remoteStream}
-	<div class="relative min-h-0 overflow-clip rounded-lg" bind:this={rootElement}>
-		{#if remoteStream}
-			<video
-				use:srcObject={remoteStream}
-				class="h-full w-full object-cover"
-				autoplay
-				muted={isMuted}
-			></video>
-		{:else}
-			No signal!
+<Screen stream={remoteStream} bind:root={screen} muted={isMuted}>
+	<svelte:fragment slot="info">
+		<ConnectionStateIndicator state={connectionState} />
+
+		{peer.name}
+
+		{#if peer.batteryStatus}
+			<BatteryIndicator level={peer.batteryStatus.level} charging={peer.batteryStatus.isCharging} />
 		{/if}
-
-		<div
-			class="absolute top-2 left-2 flex items-center gap-2 rounded-full bg-yellow-200 py-1 pr-3 pl-2 text-xs"
-		>
-			<ConnectionStateIndicator state={connectionState} />
-
-			{peer.name}
-
-			{#if peer.batteryStatus}
-				<BatteryIndicator
-					level={peer.batteryStatus.level}
-					charging={peer.batteryStatus.isCharging}
-				/>
-			{/if}
-		</div>
-
-		<div class="absolute right-2 bottom-2 flex gap-2">
-			{#if remoteStream}
-				<ToggleButtonIcon
-					isInitialyEnabled={false}
-					onToggle={(isEnabled: boolean) => (isMuted = !isEnabled)}
-					iconEnabled={VolumeHigh}
-					iconDisabled={VolumeMute}
-					size={18}
-				/>
-				<ToggleButtonIcon
-					isInitialyEnabled={false}
-					onToggle={(isEnabled: boolean) => toggleFullscreen(isEnabled)}
-					iconEnabled={ContractOutline}
-					iconDisabled={ExpandOutline}
-					size={18}
-				/>
-			{/if}
-		</div>
-	</div>
-{/if}
+	</svelte:fragment>
+	<svelte:fragment slot="controls">
+		<ToggleButtonIcon
+			isInitialyEnabled={false}
+			onToggle={(isEnabled: boolean) => toggleAudio(isEnabled)}
+			iconEnabled={VolumeHigh}
+			iconDisabled={VolumeMute}
+			size={18}
+		/>
+		<ToggleButtonIcon
+			isInitialyEnabled={false}
+			onToggle={(isEnabled: boolean) => toggleFullscreen(isEnabled)}
+			iconEnabled={ContractOutline}
+			iconDisabled={ExpandOutline}
+			size={18}
+		/>
+	</svelte:fragment>
+</Screen>
