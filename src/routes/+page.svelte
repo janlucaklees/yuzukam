@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, setContext } from 'svelte';
+	import { onMount, getContext } from 'svelte';
 	import { SettingsOutline, TvOutline, VideocamOutline } from 'svelte-ionicons';
 	import { v4 as uuidv4 } from 'uuid';
 
@@ -21,9 +21,7 @@
 	let name = createPersistentRune<string>('name', 'Yuzukam');
 
 	const peers = new SvelteMap<string, ClientMetadata>();
-
-	const socket = new SignalingSocket($uuid);
-	setContext('socket', socket);
+	const socket: SignalingSocket = getContext('socket');
 
 	onMount(async () => {
 		const batteryService = await BatteryService.init();

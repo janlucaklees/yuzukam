@@ -1,0 +1,7 @@
+enum CloseCodes {
+	VERSION_MISMATCH = 4464,
+	MULTIPLE_CONNECTIONS = 4499,
+	GRACEFUL_SHUTDOWN = 4111
+}
+
+export default CloseCodes;

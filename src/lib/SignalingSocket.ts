@@ -16,9 +16,9 @@ export default class SignalingSocket {
 
 	private listeners: Listener[] = [];
 
-	constructor(uuid: string) {
+	constructor(version: string, uuid: string) {
 		this.clientUuid = uuid;
-		this.endpoint = `ws://${location.hostname}:${location.port}/api/connect?uuid=${uuid}`;
+		this.endpoint = `ws://${location.hostname}:${location.port}/api/connect?version=${version}&uuid=${uuid}`;
 		this.socket = this.createSocket();
 	}
 

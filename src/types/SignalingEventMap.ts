@@ -2,6 +2,7 @@ import type { ClientMetadata } from './ClientMetadata';
 import type { Message } from './Message';
 
 interface SignalingEventMap {
+	'connection-confirmed': Message<'connection-confirmed', object>;
 	'client-connected': Message<'introduction', ClientMetadata>;
 	'client-disconnected': Message<'introduction', ClientMetadata>;
 	introduction: Message<'introduction', ClientMetadata>;

@@ -1,9 +1,14 @@
+import pkg from '../package.json';
+
 import { type ServerWebSocket } from 'bun';
 import { validate as isValidUuid } from 'uuid';
+
+import CloseCodes from '../src/types/CloseCodes';
 
 const PORT = 3000;
 
 type ClientData = {
+	version: string;
 	uuid: string;
 };
 
@@ -20,7 +25,12 @@ Bun.serve<ClientData>({
 		console.log(`[${timestamp}] ${clientIP} accessed ${url.pathname}`);
 
 		if (url.pathname === '/api/connect') {
+			const version = url.searchParams.get('version');
 			const uuid = url.searchParams.get('uuid');
+
+			if (version === null) {
+				return new Response('No version given.', { status: 400 });
+			}
 
 			if (uuid === null) {
 				return new Response('No uuid given.', { status: 400 });
@@ -32,7 +42,8 @@ Bun.serve<ClientData>({
 
 			const wasUpgradeSuccessful = server.upgrade(req, {
 				data: {
-					uuid: url.searchParams.get('uuid')
+					uuid: url.searchParams.get('uuid'),
+					version
 				}
 			});
 
@@ -54,14 +65,24 @@ Bun.serve<ClientData>({
 	},
 	websocket: {
 		open(ws) {
+			const uuid = ws.data.uuid;
+
 			// Close any open connection for the same client.
 			const currentConnection = clients.get(ws.data.uuid);
 			if (currentConnection) {
 				currentConnection.close(4499, 'Connection closed: New client connection established.');
 			}
 
-			// Store the client in the client map and subscribe them to the general channel.
-			clients.set(ws.data.uuid, ws);
+			// Store the client in the client map
+			clients.set(uuid, ws);
+
+			// Exclude the client, in case of a version mismatch.
+			if (ws.data.version !== pkg.version) {
+				ws.close(CloseCodes.VERSION_MISMATCH, 'Connection closed: Version mismatch.');
+				return;
+			}
+
+			// Subscribe the client to the general channel for broadcasted messages.
 			ws.subscribe('general');
 
 			// Notify other clients.
@@ -72,8 +93,18 @@ Bun.serve<ClientData>({
 					recipient: 'all',
 					subject: 'client-connected',
 					payload: {
-						uuid: ws.data.uuid
+						uuid
 					}
+				})
+			);
+
+			// Notify the client about successful connection.
+			ws.send(
+				JSON.stringify({
+					sender: 'server',
+					recipient: uuid,
+					subject: 'connection-confirmed',
+					payload: {}
 				})
 			);
 		},
@@ -105,10 +136,18 @@ Bun.serve<ClientData>({
 
 			clients.get(message.recipient)!.send(rawMessage);
 		},
-		close(ws) {
-			// Remove the client from the general channel and the client map.
-			ws.unsubscribe('general');
+		close(ws, code) {
+			// Remove the client from the general channel
 			clients.delete(ws.data.uuid);
+
+			// If the client connection was closed because of a version mismatch, we do not want to notify
+			// other clients, and don't need to unsubscribe the client from the broadcasting channel.
+			if (code === CloseCodes.VERSION_MISMATCH) {
+				return;
+			}
+
+			// Remove the client form the general broadcasting channel.
+			ws.unsubscribe('general');
 
 			// Notify other clients.
 			ws.publish(
