@@ -78,11 +78,13 @@
 
 <!-- Settings -->
 <div class="fixed top-0 right-0 flex w-screen justify-end">
-	<div
-		class="flex h-14 w-14 flex-none items-center justify-center rounded-bl-full bg-yellow-200 pb-3 pl-3"
+	<button
+		type="button"
+		on:click={() => (isMenuOpen = !isMenuOpen)}
+		class="flex h-14 w-14 flex-none cursor-pointer items-center justify-center rounded-bl-full bg-yellow-200 pb-3 pl-3"
 	>
-		<SettingsOutline onclick={() => (isMenuOpen = !isMenuOpen)} />
-	</div>
+		<SettingsOutline />
+	</button>
 
 	{#if isMenuOpen}
 		<div class="flex h-14 min-w-0 shrink items-center gap-4 bg-gray-300 pr-2 pl-4">
