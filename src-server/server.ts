@@ -42,7 +42,7 @@ Bun.serve<ClientData>({
 
 			const wasUpgradeSuccessful = server.upgrade(req, {
 				data: {
-					uuid: url.searchParams.get('uuid'),
+					uuid,
 					version
 				}
 			});
@@ -68,9 +68,12 @@ Bun.serve<ClientData>({
 			const uuid = ws.data.uuid;
 
 			// Close any open connection for the same client.
-			const currentConnection = clients.get(ws.data.uuid);
+			const currentConnection = clients.get(uuid);
 			if (currentConnection) {
-				currentConnection.close(4499, 'Connection closed: New client connection established.');
+				currentConnection.close(
+					CloseCodes.MULTIPLE_CONNECTIONS,
+					'Connection closed: New client connection established.'
+				);
 			}
 
 			// Store the client in the client map

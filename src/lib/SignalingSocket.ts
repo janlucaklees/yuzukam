@@ -1,4 +1,6 @@
 import { type SignalingEventMap } from '$types/SignalingEventMap';
+import CloseCodes from '$types/CloseCodes';
+
 import SignalingChannel from '$lib/SignalingChannel';
 
 // Keeping this generic, so I keep my sanity.
@@ -34,7 +36,10 @@ export default class SignalingSocket {
 		// Make sure to reconnect when the socket closes.
 		socket.addEventListener('close', (event) => {
 			// But only if it wasn't closed for a good reason.
-			if (event.code === 4499 || event.code === 4111) {
+			if (
+				event.code === CloseCodes.MULTIPLE_CONNECTIONS ||
+				event.code === CloseCodes.GRACEFUL_SHUTDOWN
+			) {
 				console.log('Not reconnecting, reason: ', event.reason);
 				return;
 			}
@@ -107,6 +112,6 @@ export default class SignalingSocket {
 	}
 
 	public close() {
-		this.socket.close(4111, 'Connection closed: Graceful shutdown.');
+		this.socket.close(CloseCodes.GRACEFUL_SHUTDOWN, 'Connection closed: Graceful shutdown.');
 	}
 }
