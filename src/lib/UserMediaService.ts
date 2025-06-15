@@ -2,11 +2,14 @@ import { type Callback } from '$types/Callback';
 import EventSystem from '$lib/EventSystem';
 
 interface UserMediaServiceEventMap extends Record<string, unknown[]> {
+	permissionstate: [state: PermissionState];
 	stream: [stream: MediaStream];
+	error: [error: unknown];
 }
 
 export default class UserMediaService {
 	private eventSystem = new EventSystem<UserMediaServiceEventMap>();
+
 	private stream: MediaStream | undefined;
 
 	constructor(
@@ -23,19 +26,30 @@ export default class UserMediaService {
 		this.ensureStreamStopped(this.stream);
 
 		// Get and set new stream
-		this.stream = await navigator.mediaDevices.getUserMedia(this.constraints);
+		try {
+			const permissionStatus = await navigator.permissions.query({ name: 'camera' });
 
-		// Register listener to restart stream, if stopped.
-		this.stream.getTracks().forEach((track) =>
-			track.addEventListener('ended', async () => {
-				console.log('Restarting local camera feed...');
+			this.eventSystem.dispatch('permissionstate', [permissionStatus.state]);
 
-				this.restartStream();
-			})
-		);
+			permissionStatus.addEventListener('change', () => {
+				this.eventSystem.dispatch('permissionstate', [permissionStatus.state]);
+			});
 
-		// Notify listeners
-		this.eventSystem.dispatch('stream', [this.stream]);
+			this.stream = await navigator.mediaDevices.getUserMedia(this.constraints);
+
+			// Register listener to restart stream, if stopped.
+			this.stream.getTracks().forEach((track) =>
+				track.addEventListener('ended', async () => {
+					console.log('Restarting local camera feed...');
+
+					this.restartStream();
+				})
+			);
+
+			this.eventSystem.dispatch('stream', [this.stream]);
+		} catch (error: unknown) {
+			this.eventSystem.dispatch('error', [error]);
+		}
 	}
 
 	on<K extends keyof UserMediaServiceEventMap>(
