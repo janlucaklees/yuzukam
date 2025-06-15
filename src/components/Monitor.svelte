@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { type ClientMetadata } from '$types/ClientMetadata';
+	import Message from '$components/Message.svelte';
 	import Receiver from './Receiver.svelte';
 
 	export let cameras: ClientMetadata[];
@@ -9,17 +10,11 @@
 	{#each cameras as peer (peer.uuid)}
 		<Receiver {peer} />
 	{:else}
-		<div class="flex flex-col items-center h-full justify-center">
-			<img
-				src="/yuzukam_hiding.png"
-				class="w-auto h-56"
-				alt="A baby hiding their face, pretending not to be there."
-			/>
-			<div class="text-2xl -mt-4 mb-6">No babys here...</div>
-			<div class="bg-yellow-200 rounded-xl px-4 py-3 text-center">
-				Open this web page on another device and use it to keep an eye on your little one.
-			</div>
-		</div>
+		<Message
+			imageSource="yuzukam_hiding.png"
+			message="No babys here..."
+			hint="Open this web page on another device and use it to keep an eye on your little one."
+		/>
 	{/each}
 </div>
 
