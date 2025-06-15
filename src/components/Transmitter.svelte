@@ -50,15 +50,13 @@
 <style>
 	@reference 'tailwindcss';
 
-	@media screen and (orientation: landscape) and (max-width: 768px) {
-		.monitor {
-			@apply rounded-full py-1 pr-3 pl-2 text-xs;
-		}
+	.monitor {
+		@apply rounded-lg px-3 py-1 text-sm;
 	}
 
-	@media screen and (orientation: portrait), (min-width: 769px) {
+	@media screen and (orientation: landscape) and (max-height: 768px) {
 		.monitor {
-			@apply rounded-lg px-3 py-1 text-sm;
+			@apply rounded-full py-1 pr-3 pl-2 text-xs;
 		}
 	}
 </style>

@@ -7,7 +7,7 @@
 	export let cameras: ClientMetadata[];
 </script>
 
-<div class="main relative mx-auto flex flex-col px-4 py-4">
+<div class="relative mx-auto flex h-svh max-w-3xl flex-col px-2 py-2">
 	{#each cameras as peer (peer.uuid)}
 		<Receiver {peer} />
 	{:else}
@@ -23,16 +23,3 @@
 		/>
 	{/each}
 </div>
-
-<style>
-	@reference 'tailwindcss';
-
-	:root {
-		--max-screen-width: 768px;
-	}
-
-	.main {
-		max-width: var(--max-screen-width);
-		height: 100vh;
-	}
-</style>

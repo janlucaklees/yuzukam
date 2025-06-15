@@ -18,7 +18,10 @@
 	}
 </script>
 
-<div class="relative aspect-4/3 overflow-clip rounded-lg bg-gray-300 {clazz}" bind:this={root}>
+<div
+	class="relative aspect-4/3 min-h-0 overflow-clip rounded-lg bg-gray-300 {clazz}"
+	bind:this={root}
+>
 	{#if stream}
 		<video use:srcObject={stream} class="h-full w-full object-cover" autoplay {muted}></video>
 	{:else}
