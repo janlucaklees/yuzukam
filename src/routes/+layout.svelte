@@ -17,8 +17,12 @@
 
 	let isConnected = $state(false);
 
-	// Establish connection to the signaling server and expose it to all children.
+	//
+	// Get values from the local storage.
+	let reloadCount = createPersistentRune<string>('reloadCount', 0);
 	let uuid = createPersistentRune<string>('uuid', uuidv4());
+
+	// Establish connection to the signaling server and expose it to all children.
 	const socket = new SignalingSocket(__APP_VERSION__, $uuid);
 	setContext('socket', socket);
 
@@ -31,9 +35,21 @@
 		}
 	});
 
+	// Reload the app once, if the socket gives an error. We only want to reload once, to update the
+	// app. If that does not work, then we do not want to spam the server with reloads.
+	socket.on('error', (error) => {
+		if ($reloadCount === 0) {
+			reloadCount.set($reloadCount + 1);
+			location.reload();
+		}
+
+		console.log(error);
+	});
+
 	// Listen for confirmation through the server that the connection was established to render child
 	// components.
 	socket.onMessage('connection-confirmed', () => {
+		reloadCount.set(0);
 		isConnected = true;
 	});
 </script>
