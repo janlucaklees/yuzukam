@@ -1,38 +1,94 @@
-# sv
+# Yuzukam
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A privacy-first, self-hosted baby monitor for your local network.
 
-## Creating a project
+## About
 
-If you're seeing this, you've probably already done this step. Congrats!
+Yuzukam is a baby monitoring web-app meant to be self hosted in your local network - no data
+stored, no cloud-connection, no subscriptions. Designed for privacy-minded parents that host their
+own stuff.
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Setup
 
-# create a new project in my-app
-npx sv create my-app
+To use Yuzukam in your local network, some setup is required:
+Browsers block webcam and microphone access on non-secure pages.
+You’ll need to either enable HTTPS in your network or use a Chromium-based browser with a security exception.
+
+The following steps walk you through the easiest option of using a Chrome-based browser with an
+insecure origin override.
+
+### 1. Host the app
+
+Run Yuzukam on your home server (or any other always-on device in your LAN) using Docker Compose:
+
+```yml
+services:
+  yuzukam:
+    image: ghcr.io/janlucaklees/yuzukam:latest
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
 ```
 
-## Developing
+### 2. Prepare your camera device
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Choose a device to place near your baby - usually an old laptop or something with a webcam and
+microphone.
 
-```bash
-npm run dev
+1. Install a Chromium-based browser (like Chrome, Brave, or Edge).
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+2. In that browser, visit [chrome://flags/#unsafely-treat-insecure-origin-as-secure](chrome://flags/#unsafely-treat-insecure-origin-as-secure)
 
-## Building
+3. Add your host device’s address, using this format: `http://<host>:<port>`
 
-To create a production version of your app:
+> ⚠️ This only works on desktop Chromium browsers. Mobile or Safari / Firefox users will need
+> HTTPS.
 
-```bash
-npm run build
-```
+Take an old laptop and install a chromium-based Browser of your choise. This will be the device you
+leave beside your baby.
 
-You can preview the production build with `npm run preview`.
+On that device's chromium-based browser go to [chrome://flags/#unsafely-treat-insecure-origin-as-secure](chrome://flags/#unsafely-treat-insecure-origin-as-secure)
+and enter the IP or hostname of the device where you host Yuzukam.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+> Follow this format:
+
+### 3. Start monitoring your baby
+
+Open Yuzukam in the browser on your camera device. Position it so the webcam faces your baby.
+
+> ⚙️ Click the gear icon in the top right to give the device a name (e.g. “nursery” or your babys
+> name).
+
+> Optional: Click on the gear in the top right and change the name fo the device to identify it more easily.
+
+Then, from any other device in your home network, open the same Yuzukam address to monitor the stream.
+
+> 🖥️ On first launch, each device is set to “Camera” mode. To switch a device to “Monitor” mode,
+> click the gear icon in the top right, then tap the camera icon. This setting is saved on device and
+> only needs to be changed once.
+
+## Features
+
+- Support watching mutiple babys from multiple devices simultaneously
+- Lets you name devices for clarity (e.g. "nursery", "living room", or your childs name)
+- Runs in any modern browser, on Linux, Windows and probably Mac!
+- Gives new life to old devices
+
+## Privacy
+
+- ❌ No internet streaming (local network only)
+- ❌ No recording or cloud storage
+- ❌ No phoning home, no analytics, no tracking
+- ❌ No account needed, no subscriptions
+
+---
+
+## License
+
+The source code for this project is licensed under the Mozilla Public License 2.0.
+For details on third-party licensing, Docker image usage, bundled libraries, and UI asset rights,
+please refer to the [NOTICE.md](./NOTICE.md) file.
+
+---
+
+Yuzukam is a self-hosted, local-only baby monitor built for privacy-conscious parents and DIY home server setups. It runs entirely offline and is ideal for repurposing old devices as secure, cloud-free baby cams.

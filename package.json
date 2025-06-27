@@ -3,6 +3,16 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"licenses": [
+		{
+			"type": "MPL-2.0",
+			"url": "https://www.mozilla.org/MPL/2.0/"
+		},
+		{
+			"type": "CC-BY-NC-4.0",
+			"url": "https://creativecommons.org/licenses/by-nc/4.0/"
+		}
+	],
 	"scripts": {
 		"dev": "bun run dev:server & bun run dev:frontend",
 		"dev:server": "bun run --watch ./src-server/server.ts",

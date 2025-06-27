@@ -1,0 +1,29 @@
+version = 1
+
+[[annotations]]
+path = [
+  ".github/**/*",
+  ".husky/**",
+  "src/**/*",
+  "src-server/**/*",
+  ".dockerignore",
+  ".gitignore",
+  ".lintstagedrc.json",
+  ".prettierignore",
+  ".prettierrc",
+  "bun.lock",
+  "docker-compose.yml",
+  "Dockerfile",
+  "eslint.config.js",
+  "Makefile",
+  "nginx.conf",
+  "NOTICE.md",
+  "package.json",
+  "README.md",
+  "REUSE.toml",
+  "svelte.config.js",
+  "tsconfig.json",
+  "vite.config.ts",
+]
+SPDX-FileCopyrightText = "2025 Jan-Luca Klees <email@janlucaklees.de>"
+SPDX-License-Identifier = "MPL-2.0"
