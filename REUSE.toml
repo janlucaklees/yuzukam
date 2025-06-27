@@ -6,6 +6,7 @@ path = [
   ".husky/**",
   "src/**/*",
   "src-server/**/*",
+  "static/site.webmanifest",
   ".dockerignore",
   ".gitignore",
   ".lintstagedrc.json",
