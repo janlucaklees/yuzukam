@@ -12,7 +12,8 @@ own stuff.
 
 To use Yuzukam in your local network, some setup is required:
 Browsers block webcam and microphone access on non-secure pages.
-You’ll need to either enable HTTPS in your network or use a Chromium-based browser with a security exception.
+You’ll need to either enable HTTPS in your network or use a Chromium-based browser with a security
+exception.
 
 The following steps walk you through the easiest option of using a Chrome-based browser with an
 insecure origin override.
@@ -44,22 +45,12 @@ microphone.
 > ⚠️ This only works on desktop Chromium browsers. Mobile or Safari / Firefox users will need
 > HTTPS.
 
-Take an old laptop and install a chromium-based Browser of your choise. This will be the device you
-leave beside your baby.
-
-On that device's chromium-based browser go to [chrome://flags/#unsafely-treat-insecure-origin-as-secure](chrome://flags/#unsafely-treat-insecure-origin-as-secure)
-and enter the IP or hostname of the device where you host Yuzukam.
-
-> Follow this format:
-
 ### 3. Start monitoring your baby
 
 Open Yuzukam in the browser on your camera device. Position it so the webcam faces your baby.
 
 > ⚙️ Click the gear icon in the top right to give the device a name (e.g. “nursery” or your babys
 > name).
-
-> Optional: Click on the gear in the top right and change the name fo the device to identify it more easily.
 
 Then, from any other device in your home network, open the same Yuzukam address to monitor the stream.
 
@@ -91,4 +82,4 @@ please refer to the [NOTICE.md](./NOTICE.md) file.
 
 ---
 
-Yuzukam is a self-hosted, local-only baby monitor built for privacy-conscious parents and DIY home server setups. It runs entirely offline and is ideal for repurposing old devices as secure, cloud-free baby cams.
+**Yuzukam** is a self-hosted, local-only baby monitor built for privacy-conscious parents and DIY home server setups. It runs entirely offline and is ideal for repurposing old devices as secure, cloud-free baby cams.
