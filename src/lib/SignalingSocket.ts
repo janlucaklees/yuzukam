@@ -20,7 +20,7 @@ export default class SignalingSocket {
 
 	constructor(version: string, uuid: string) {
 		this.clientUuid = uuid;
-		this.endpoint = `ws://${location.hostname}:${location.port}/api/connect?version=${version}&uuid=${uuid}`;
+		this.endpoint = `ws${location.protocol.replace('http', '')}//${location.hostname}:${location.port}/api/connect?version=${version}&uuid=${uuid}`;
 		this.socket = this.createSocket();
 	}
 
