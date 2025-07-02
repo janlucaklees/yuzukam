@@ -1,5 +1,5 @@
-.PHONY=dev
-dev:
+.PHONY=start
+start:
 	docker compose up -d
 
 .PHONY=image-build
