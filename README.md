@@ -3,7 +3,7 @@
 A privacy-first, self-hosted baby monitor for your local network.
 
 <p align="center">
-<img src="static/mockup/mockup.png">
+<img src="static/mockup/mockup.png" alt="A mockup illustration showing a laptop and a smartphone side by side. The laptop screen displays a cute baby wrapped in a blanket with a yuzu fruit for a head, labeled 'You' with the text 'Papa is watching' below. The smartphone shows the same baby image, labeled 'Yuzu-chan'. Above the laptop is the text 'Put this next to your child,' and above the phone is the text 'Keep watch on your phone,' with arrows pointing to each device.">
 </p>
 
 ## About
