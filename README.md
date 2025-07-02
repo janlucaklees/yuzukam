@@ -2,6 +2,10 @@
 
 A privacy-first, self-hosted baby monitor for your local network.
 
+<p align="center">
+<img src="static/mockup/mockup.png" width="800">
+</p>
+
 ## About
 
 Yuzukam is a baby monitoring web-app meant to be self hosted in your local network - no data
