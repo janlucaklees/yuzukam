@@ -3,7 +3,7 @@
 A privacy-first, self-hosted baby monitor for your local network.
 
 <p align="center">
-<img src="static/mockup/mockup.png" width="800">
+<img src="static/mockup/mockup.png">
 </p>
 
 ## About
