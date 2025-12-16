@@ -70,7 +70,7 @@
 			'Uhh... something’s being weird with the camera.',
 			'Hmm... something went wrong with the camera'
 		])}
-		hint={`An error occured. Maybe the message will help you: ${error}`}
+		hint={`An error occured. Maybe this message will help you: ${error}`}
 	/>
 {:else}
 	<div class="relative mx-auto flex h-svh max-w-3xl flex-col px-2 py-2">
