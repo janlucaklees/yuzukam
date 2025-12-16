@@ -42,7 +42,7 @@
 			location.reload();
 		}
 
-		console.log(error);
+		console.error(error);
 	});
 
 	// Listen for confirmation through the server that the connection was established to render child
