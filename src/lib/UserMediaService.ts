@@ -14,8 +14,16 @@ export default class UserMediaService {
 
 	constructor(
 		private readonly constraints: MediaStreamConstraints = {
-			video: true,
-			audio: true
+			video: {
+				width: { ideal: 640 },
+				height: { ideal: 360 },
+				frameRate: { ideal: 12 }
+			},
+			audio: {
+				echoCancellation: true,
+				noiseSuppression: true,
+				autoGainControl: true
+			}
 		}
 	) {
 		this.restartStream();
