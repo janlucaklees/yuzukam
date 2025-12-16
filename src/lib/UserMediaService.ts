@@ -2,7 +2,7 @@ import { type Callback } from '$types/Callback';
 import EventSystem from '$lib/EventSystem';
 
 interface UserMediaServiceEventMap extends Record<string, unknown[]> {
-	permissionstate: [state: PermissionState];
+	'permission-state': [state: PermissionState];
 	stream: [stream: MediaStream];
 	error: [error: unknown];
 }
@@ -37,10 +37,10 @@ export default class UserMediaService {
 		try {
 			const permissionStatus = await navigator.permissions.query({ name: 'camera' });
 
-			this.eventSystem.dispatch('permissionstate', [permissionStatus.state]);
+			this.eventSystem.dispatch('permission-state', [permissionStatus.state]);
 
 			permissionStatus.addEventListener('change', () => {
-				this.eventSystem.dispatch('permissionstate', [permissionStatus.state]);
+				this.eventSystem.dispatch('permission-state', [permissionStatus.state]);
 			});
 
 			this.stream = await navigator.mediaDevices.getUserMedia(this.constraints);

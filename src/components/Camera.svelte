@@ -17,7 +17,7 @@
 	onMount(async () => {
 		userMediaService = new UserMediaService();
 
-		userMediaService.on('permissionstate', (newPermissionState) => {
+		userMediaService.on('permission-state', (newPermissionState) => {
 			permissionState = newPermissionState;
 		});
 
