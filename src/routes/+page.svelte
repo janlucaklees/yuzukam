@@ -18,7 +18,7 @@
 			message={pickOne([
 				'Yikes! The internet ran off!',
 				'Hello? Internet? Where’d you go?',
-				'Hello? Internet? Where’d you go?'
+				'Uh-oh… Internet is hiding again!'
 			])}
 			hint="There’s no internet connection. Please check your Wi-Fi or network settings."
 		/>
