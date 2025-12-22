@@ -3,6 +3,7 @@ services:
     image: oven/bun:1-alpine
     command: dev:server
     working_dir: /usr/src/app
+    user: '${UID}:${GID}'
     volumes:
       - ./:/usr/src/app
 
@@ -10,6 +11,7 @@ services:
     image: oven/bun:1-alpine
     command: bun dev:frontend
     working_dir: /usr/src/app
+    user: '${UID}:${GID}'
     volumes:
       - ./:/usr/src/app
 
