@@ -1,6 +1,10 @@
 <script lang="ts">
-	export let level: number;
-	export let charging: boolean;
+	interface Props {
+		level: number;
+		charging: boolean;
+	}
+
+	let { level, charging }: Props = $props();
 
 	function getBatteryLevelClass(level: number) {
 		if (level <= 0.05) {

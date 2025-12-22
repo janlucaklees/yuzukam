@@ -1,7 +1,9 @@
 <script lang="ts">
-	//
-	// Props
-	export let state: RTCPeerConnectionState;
+	interface Props {
+		state: RTCPeerConnectionState;
+	}
+
+	let { state }: Props = $props();
 </script>
 
 {#if state === 'connected'}

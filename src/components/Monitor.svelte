@@ -4,7 +4,11 @@
 	import Receiver from './Receiver.svelte';
 	import pickOne from '$lib/pickOne';
 
-	export let cameras: ClientMetadata[];
+	interface Props {
+		cameras: ClientMetadata[];
+	}
+
+	let { cameras }: Props = $props();
 </script>
 
 <div class="relative mx-auto flex h-svh max-w-3xl flex-col px-2 py-2">

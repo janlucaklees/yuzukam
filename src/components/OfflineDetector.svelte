@@ -1,5 +1,13 @@
 <script lang="ts">
-	let isOnline = window.navigator.onLine;
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		online: Snippet;
+		offline: Snippet;
+	}
+
+	let { online, offline }: Props = $props();
+	let isOnline: boolean = $state(window.navigator.onLine);
 
 	window.addEventListener('online', () => {
 		isOnline = true;
@@ -11,7 +19,7 @@
 </script>
 
 {#if isOnline}
-	<slot name="online"></slot>
+	{@render online()}
 {:else}
-	<slot name="offline"></slot>
+	{@render offline()}
 {/if}

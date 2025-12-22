@@ -6,7 +6,7 @@
 
 	import ToggleButtonIcon from '$components/ToggleButtonIcon.svelte';
 
-	let isMenuOpen = false;
+	let isMenuOpen = $state(false);
 
 	function toggleType(isEnabled: boolean) {
 		type.set(isEnabled ? 'camera' : 'monitor');
@@ -16,7 +16,7 @@
 <div class="fixed top-0 right-0 flex w-screen justify-end">
 	<button
 		type="button"
-		on:click={() => (isMenuOpen = !isMenuOpen)}
+		onclick={() => (isMenuOpen = !isMenuOpen)}
 		class="flex h-14 w-14 flex-none cursor-pointer items-center justify-center rounded-bl-full bg-yellow-200 pb-3 pl-3"
 	>
 		<SettingsOutline />

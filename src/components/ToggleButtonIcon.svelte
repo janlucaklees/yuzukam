@@ -1,30 +1,41 @@
 <script lang="ts">
-	export let iconEnabled;
-	export let iconDisabled;
+	import type { Component } from 'svelte';
 
-	export let onToggle: CallableFunction = () => {};
-	export let isInitialyEnabled = true;
+	interface Props {
+		iconEnabled: Component;
+		iconDisabled: Component;
+		onToggle?: CallableFunction;
+		isInitialyEnabled?: boolean;
+		size?: number;
+		class?: string;
+	}
 
-	export let size = 24;
+	let {
+		class: clazz = '',
+		iconEnabled,
+		iconDisabled,
+		onToggle = () => {},
+		isInitialyEnabled = true,
+		size = 24
+	}: Props = $props();
 
-	let clazz = '';
-	export { clazz as class };
-
-	let isEnabled = isInitialyEnabled;
+	let isEnabled = $state(isInitialyEnabled);
 
 	function toggle() {
 		isEnabled = !isEnabled;
 
 		onToggle(isEnabled);
 	}
+
+	const SvelteComponent = $derived(isEnabled ? iconEnabled : iconDisabled);
 </script>
 
 <button
 	type="button"
-	on:click={toggle}
+	onclick={toggle}
 	class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-yellow-200 {clazz}"
 >
-	<svelte:component this={isEnabled ? iconEnabled : iconDisabled} {size} />
+	<SvelteComponent {size} />
 </button>
 
 <style>

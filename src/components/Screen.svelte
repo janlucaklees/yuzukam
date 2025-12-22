@@ -1,12 +1,23 @@
 <script lang="ts">
-	let clazz = '';
-	export { clazz as class };
+	import type { Snippet } from 'svelte';
 
-	let root: HTMLElement;
-	export { root };
+	interface Props {
+		class?: string;
+		root: HTMLElement;
+		stream: MediaStream | undefined;
+		muted?: boolean;
+		info?: Snippet;
+		controls?: Snippet;
+	}
 
-	export let stream: MediaStream | undefined;
-	export let muted: boolean = true;
+	let {
+		class: clazz = '',
+		root = $bindable(),
+		stream,
+		muted = true,
+		info,
+		controls
+	}: Props = $props();
 
 	function srcObject(node: HTMLVideoElement, stream: MediaStream) {
 		node.srcObject = stream;
@@ -36,10 +47,10 @@
 	<div
 		class="absolute top-2 left-2 flex items-center gap-2 rounded-full bg-yellow-200 px-3 py-1 text-xs"
 	>
-		<slot name="info"></slot>
+		{@render info?.()}
 	</div>
 
 	<div class="absolute right-2 bottom-2 flex gap-2">
-		<slot name="controls"></slot>
+		{@render controls?.()}
 	</div>
 </div>

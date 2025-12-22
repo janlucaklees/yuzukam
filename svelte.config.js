@@ -7,6 +7,10 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 
+	compilerOptions: {
+		runes: true // or false, to keep legacy reactivity by default
+	},
+
 	kit: {
 		adapter: adapter({
 			pages: 'build/frontend',

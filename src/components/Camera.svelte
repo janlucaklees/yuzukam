@@ -7,11 +7,15 @@
 	import Message from '$components/Message.svelte';
 	import pickOne from '$lib/pickOne';
 
-	export let monitors: ClientMetadata[];
+	interface Props {
+		monitors: ClientMetadata[];
+	}
 
-	let permissionState: PermissionState | undefined;
-	let stream: MediaStream | undefined;
-	let error: string;
+	let { monitors }: Props = $props();
+
+	let permissionState: PermissionState | undefined = $state();
+	let stream: MediaStream | undefined = $state();
+	let error: string | undefined = $state();
 	let userMediaService: UserMediaService | undefined;
 
 	onMount(async () => {

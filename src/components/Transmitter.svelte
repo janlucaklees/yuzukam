@@ -11,8 +11,11 @@
 
 	//
 	// Props
-	export let peer: ClientMetadata;
-	export let stream: MediaStream;
+	interface Props {
+		peer: ClientMetadata;
+		stream: MediaStream;
+	}
+	let { peer, stream }: Props = $props();
 
 	//
 	// Context
@@ -22,7 +25,7 @@
 	// Globals
 	let channel: SignalingChannel | undefined;
 	let connection: PeerConnectionHandler | undefined;
-	let connectionState: RTCPeerConnectionState;
+	let connectionState: RTCPeerConnectionState | undefined = $state();
 
 	onMount(() => {
 		channel = socket.createChannel(peer.uuid);
@@ -42,7 +45,7 @@
 </script>
 
 <div class="monitor flex items-center gap-2 bg-yellow-200">
-	<ConnectionStateIndicator state={connectionState} />
+	<ConnectionStateIndicator state={connectionState!} />
 
 	{peer.name} is watching
 </div>

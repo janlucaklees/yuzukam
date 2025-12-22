@@ -7,12 +7,12 @@
 </script>
 
 <OfflineDetector>
-	<svelte:fragment slot="online">
+	{#snippet online()}
 		<SignalingSocketProvider>
 			<PeerManager />
 		</SignalingSocketProvider>
-	</svelte:fragment>
-	<svelte:fragment slot="offline">
+	{/snippet}
+	{#snippet offline()}
 		<Message
 			imageSource="yuzu_disconnected.png"
 			message={pickOne([
@@ -22,5 +22,5 @@
 			])}
 			hint="There’s no internet connection. Please check your Wi-Fi or network settings."
 		/>
-	</svelte:fragment>
+	{/snippet}
 </OfflineDetector>

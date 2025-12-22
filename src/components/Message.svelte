@@ -1,7 +1,11 @@
 <script lang="ts">
-	export let imageSource: string;
-	export let message: string;
-	export let hint: string;
+	interface Props {
+		imageSource: string;
+		message: string;
+		hint: string;
+	}
+
+	let { imageSource, message, hint }: Props = $props();
 </script>
 
 <div class="mx-auto flex h-svh max-w-3xl flex-col items-center justify-center px-4 py-4">

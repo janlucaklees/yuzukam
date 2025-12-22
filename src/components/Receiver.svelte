@@ -15,7 +15,10 @@
 
 	//
 	// Props
-	export let peer: ClientMetadata;
+	interface Props {
+		peer: ClientMetadata;
+	}
+	let { peer }: Props = $props();
 
 	//
 	// Context
@@ -25,10 +28,10 @@
 	// Globals
 	let channel: SignalingChannel | undefined;
 	let connection: PeerConnectionHandler | undefined;
-	let connectionState: RTCPeerConnectionState;
-	let remoteStream: MediaStream | undefined;
-	let isMuted = true;
-	let screen: HTMLElement;
+	let connectionState: RTCPeerConnectionState | undefined = $state();
+	let remoteStream: MediaStream | undefined = $state();
+	let isMuted = $state(true);
+	let screen: HTMLElement | undefined = $state();
 
 	onMount(() => {
 		channel = socket.createChannel(peer.uuid);
@@ -63,7 +66,7 @@
 </script>
 
 <Screen stream={remoteStream} bind:root={screen} muted={isMuted}>
-	<svelte:fragment slot="info">
+	{#snippet info()}
 		<ConnectionStateIndicator state={connectionState} />
 
 		{peer.name}
@@ -71,8 +74,8 @@
 		{#if peer.batteryStatus}
 			<BatteryIndicator level={peer.batteryStatus.level} charging={peer.batteryStatus.isCharging} />
 		{/if}
-	</svelte:fragment>
-	<svelte:fragment slot="controls">
+	{/snippet}
+	{#snippet controls()}
 		<ToggleButtonIcon
 			isInitialyEnabled={false}
 			onToggle={(isEnabled: boolean) => toggleAudio(isEnabled)}
@@ -87,5 +90,5 @@
 			iconDisabled={ExpandOutline}
 			size={18}
 		/>
-	</svelte:fragment>
+	{/snippet}
 </Screen>

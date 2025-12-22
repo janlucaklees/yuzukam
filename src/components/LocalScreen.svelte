@@ -3,11 +3,13 @@
 	import ToggleButtonIcon from './ToggleButtonIcon.svelte';
 	import Screen from './Screen.svelte';
 
-	export let mediaStream: MediaStream | undefined;
-	export let name: string;
+	interface Props {
+		mediaStream: MediaStream | undefined;
+		name: string;
+		class?: string;
+	}
 
-	let clazz = '';
-	export { clazz as class };
+	let { mediaStream, name, class: clazz = '' }: Props = $props();
 
 	function toggleVideo(isEnabled: boolean) {
 		if (mediaStream) {
@@ -23,10 +25,10 @@
 </script>
 
 <Screen stream={mediaStream} class={clazz}>
-	<svelte:fragment slot="info">
+	{#snippet info()}
 		{name}
-	</svelte:fragment>
-	<svelte:fragment slot="controls">
+	{/snippet}
+	{#snippet controls()}
 		<ToggleButtonIcon
 			onToggle={(isEnabled: boolean) => toggleVideo(isEnabled)}
 			iconEnabled={Videocam}
@@ -39,5 +41,5 @@
 			iconDisabled={MicOff}
 			size={18}
 		/>
-	</svelte:fragment>
+	{/snippet}
 </Screen>
