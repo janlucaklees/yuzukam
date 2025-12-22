@@ -1,6 +1,8 @@
 .PHONY=start
 start:
+	docker compose stop
 	docker compose up -d
+	docker compose logs -f frontend
 
 .PHONY=image-build
 image-build:
