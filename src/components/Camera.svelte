@@ -26,10 +26,12 @@
 		});
 
 		userMediaService.on('error', (newError) => {
-			if (error instanceof Error) {
-				error = error.message;
-			} else {
+			if (newError instanceof Error) {
+				error = newError.message;
+			} else if (typeof newError === 'string') {
 				error = newError;
+			} else {
+				console.error(newError);
 			}
 		});
 	});
