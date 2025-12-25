@@ -62,7 +62,7 @@
 			'Eep! The camera says no!',
 			'Oh no... the camera told me no.'
 		])}
-		hint="Please reset your camera permissions and reload this page."
+		hint="Please reset your camera and microphone permissions and reload this page."
 	/>
 {:else if error}
 	<Message
