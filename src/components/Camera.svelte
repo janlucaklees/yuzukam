@@ -6,6 +6,7 @@
 	import LocalScreen from './LocalScreen.svelte';
 	import Message from '$components/Message.svelte';
 	import pickOne from '$lib/pickOne';
+	import cameraPermission from '$stores/cameraPermission.svelte';
 
 	interface Props {
 		monitors: ClientMetadata[];
@@ -13,17 +14,12 @@
 
 	let { monitors }: Props = $props();
 
-	let permissionState: PermissionState | undefined = $state();
 	let stream: MediaStream | undefined = $state();
 	let error: string | undefined = $state();
 	let userMediaService: UserMediaService | undefined;
 
 	onMount(async () => {
 		userMediaService = new UserMediaService();
-
-		userMediaService.on('permission-state', (newPermissionState) => {
-			permissionState = newPermissionState;
-		});
 
 		userMediaService.on('stream', (newStream) => {
 			stream = newStream;
@@ -47,7 +43,7 @@
 	});
 </script>
 
-{#if permissionState === 'prompt'}
+{#if cameraPermission.state === 'prompt'}
 	<Message
 		imageSource="yuzu_covering_eyes.png"
 		message={pickOne([
@@ -57,7 +53,7 @@
 		])}
 		hint="Please click “Allow while visiting the site” to give access to your camera and microphone."
 	/>
-{:else if permissionState === 'denied'}
+{:else if cameraPermission.state === 'denied'}
 	<Message
 		imageSource="yuzu_pouting.png"
 		message={pickOne([

@@ -35,14 +35,6 @@ export default class UserMediaService {
 
 		// Get and set new stream
 		try {
-			const permissionStatus = await navigator.permissions.query({ name: 'camera' });
-
-			this.eventSystem.dispatch('permission-state', [permissionStatus.state]);
-
-			permissionStatus.addEventListener('change', () => {
-				this.eventSystem.dispatch('permission-state', [permissionStatus.state]);
-			});
-
 			this.stream = await navigator.mediaDevices.getUserMedia(this.constraints);
 
 			// Register listener to restart stream, if stopped.
