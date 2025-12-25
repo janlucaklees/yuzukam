@@ -11,20 +11,19 @@
 	import Monitor from '$components/Monitor.svelte';
 	import Settings from '$components/Settings.svelte';
 	import SignalingSocket from '$lib/SignalingSocket';
-	import BatteryService from '$lib/BatteryService';
 	import PeerManager from '$lib/PeerManager';
 	import { SvelteMap } from 'svelte/reactivity';
+	import battery from '$stores/battery.svelte';
 
 	const peers = new SvelteMap<string, ClientMetadata>();
 	const socket: SignalingSocket = getContext('socket');
 
 	onMount(async () => {
-		const batteryService = await BatteryService.init();
 		const peerManager = new PeerManager(socket, {
 			uuid: $uuid,
 			type: $type,
 			name: $name,
-			batteryStatus: batteryService.getMetadata()
+			batteryStatus: battery.isSupported ? $state.snapshot(battery) : undefined
 		});
 
 		//
@@ -42,11 +41,10 @@
 		name.subscribe(() => {
 			peerManager.setMetadata({ name: $name });
 		});
-		batteryService.on('levelchange', () => {
-			peerManager.setMetadata({ batteryStatus: batteryService.getMetadata() });
-		});
-		batteryService.on('chargingchange', () => {
-			peerManager.setMetadata({ batteryStatus: batteryService.getMetadata() });
+		$effect(() => {
+			peerManager.setMetadata({
+				batteryStatus: battery.isSupported ? $state.snapshot(battery) : undefined
+			});
 		});
 
 		//
