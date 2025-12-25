@@ -72,7 +72,10 @@
 		{peer.name}
 
 		{#if peer.batteryStatus}
-			<BatteryIndicator level={peer.batteryStatus.level} charging={peer.batteryStatus.isCharging} />
+			<BatteryIndicator
+				level={peer.batteryStatus.level}
+				isCharging={peer.batteryStatus.isCharging}
+			/>
 		{/if}
 	{/snippet}
 	{#snippet controls()}
