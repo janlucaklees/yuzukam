@@ -53,7 +53,7 @@ microphone.
 
 Open Yuzukam in the browser on your camera device. Position it so the webcam faces your baby.
 
-> ⚙️ Click the gear icon in the top right to give the device a name (e.g. “nursery” or your babys
+> ⚙️ Click the gear icon in the top right to give the device a name (e.g. “nursery” or your baby's
 > name).
 
 Then, from any other device in your home network, open the same Yuzukam address to monitor the stream.
@@ -64,8 +64,8 @@ Then, from any other device in your home network, open the same Yuzukam address 
 
 ## Features
 
-- Support watching mutiple babys from multiple devices simultaneously
-- Lets you name devices for clarity (e.g. "nursery", "living room", or your childs name)
+- Supports watching multiple babies from multiple devices simultaneously
+- Lets you name devices for clarity (e.g. "nursery", "living room", or your child's name)
 - Runs in any modern browser, on Linux, Windows and probably Mac!
 - Gives new life to old devices
 
