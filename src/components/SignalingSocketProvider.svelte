@@ -13,8 +13,6 @@
 
 	let { children } = $props();
 
-	let isConnected = $state(false);
-
 	//
 	// Get values from the local storage.
 	let reloadCount = createPersistentRune<number>('reloadCount', 0);
@@ -47,10 +45,7 @@
 	// components.
 	socket.onMessage('connection-confirmed', () => {
 		reloadCount.set(0);
-		isConnected = true;
 	});
 </script>
 
-{#if isConnected}
-	{@render children()}
-{/if}
+{@render children()}
