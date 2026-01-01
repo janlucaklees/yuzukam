@@ -3,8 +3,6 @@
 </script>
 
 <script lang="ts">
-	import '../app.css';
-
 	import { setContext } from 'svelte';
 
 	import createPersistentRune from '$stores/persistentStore';
