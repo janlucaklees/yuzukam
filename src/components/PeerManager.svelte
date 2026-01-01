@@ -9,7 +9,6 @@
 
 	import Camera from '$components/Camera.svelte';
 	import Monitor from '$components/Monitor.svelte';
-	import Settings from '$components/Settings.svelte';
 	import SignalingSocket from '$lib/SignalingSocket';
 	import PeerManager from '$lib/PeerManager';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -62,5 +61,3 @@
 {:else}
 	<Monitor cameras={filterPeersByType(peers, 'camera')} />
 {/if}
-
-<Settings />
