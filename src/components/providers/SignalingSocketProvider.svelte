@@ -9,7 +9,7 @@
 	import { uuid } from '$stores/uuid';
 
 	import SignalingSocket from '$lib/SignalingSocket';
-	import CloseCodes from '../types/CloseCodes';
+	import CloseCodes from '$types/CloseCodes';
 
 	let { children } = $props();
 
