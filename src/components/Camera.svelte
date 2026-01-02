@@ -4,11 +4,10 @@
 	import UserMediaService from '$lib/UserMediaService';
 	import filterPeersByType from '$lib/filterPeersByType';
 	import { type ClientMetadata } from '$types/ClientMetadata';
-	import Transmitter from './Transmitter.svelte';
-	import LocalScreen from './LocalScreen.svelte';
+	import Transmitter from '$components/Transmitter.svelte';
+	import LocalScreen from '$components/LocalScreen.svelte';
 	import Message from '$components/Message.svelte';
 	import pickOne from '$lib/pickOne';
-	import cameraPermission from '$stores/cameraPermission.svelte';
 
 	const peers: SvelteMap<string, ClientMetadata> = getContext('peers');
 	const monitors = $derived(filterPeersByType(peers, 'monitor'));
@@ -42,28 +41,7 @@
 	});
 </script>
 
-{#if cameraPermission.state === 'prompt'}
-	<Message
-		imageSource="yuzu_covering_eyes.png"
-		message={pickOne([
-			'Can you tap the button so I can look?',
-			'Umm... can you help me see?',
-			"Peekaboo! I can't see your little one yet."
-		])}
-		hint="Please click “Allow while visiting the site” to give access to your camera and microphone."
-	/>
-{:else if cameraPermission.state === 'denied'}
-	<Message
-		imageSource="yuzu_pouting.png"
-		message={pickOne([
-			'Oops! The camera is shy.',
-			'Looks like you told the camera nope!',
-			'Eep! The camera says no!',
-			'Oh no... the camera told me no.'
-		])}
-		hint="Please reset your camera and microphone permissions and reload this page."
-	/>
-{:else if error}
+{#if error}
 	<Message
 		imageSource="yuzu_confused.png"
 		message={pickOne([

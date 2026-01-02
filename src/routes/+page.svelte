@@ -8,6 +8,7 @@
 	import Camera from '$components/Camera.svelte';
 	import CameraPeerGuard from '$components/guards/CameraPeerGuard.svelte';
 	import Monitor from '$components/Monitor.svelte';
+	import InputPermissionGuard from '$components/guards/InputPermissionGuard.svelte';
 </script>
 
 <OnlineGuard>
@@ -15,7 +16,9 @@
 		<SignalingSocketGuard>
 			<PeerProvider>
 				{#if $type === 'camera'}
-					<Camera />
+					<InputPermissionGuard>
+						<Camera />
+					</InputPermissionGuard>
 				{:else}
 					<CameraPeerGuard>
 						<Monitor />
