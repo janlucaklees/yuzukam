@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { getContext, onDestroy, onMount } from 'svelte';
+	import type { SvelteMap } from 'svelte/reactivity';
 	import UserMediaService from '$lib/UserMediaService';
+	import filterPeersByType from '$lib/filterPeersByType';
 	import { type ClientMetadata } from '$types/ClientMetadata';
 	import Transmitter from './Transmitter.svelte';
 	import LocalScreen from './LocalScreen.svelte';
@@ -8,11 +10,8 @@
 	import pickOne from '$lib/pickOne';
 	import cameraPermission from '$stores/cameraPermission.svelte';
 
-	interface Props {
-		monitors: ClientMetadata[];
-	}
-
-	let { monitors }: Props = $props();
+	const peers: SvelteMap<string, ClientMetadata> = getContext('peers');
+	const monitors = $derived(filterPeersByType(peers, 'monitor'));
 
 	let stream: MediaStream | undefined = $state();
 	let error: string | undefined = $state();

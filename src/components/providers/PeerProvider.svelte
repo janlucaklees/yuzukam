@@ -1,20 +1,22 @@
 <script lang="ts">
-	import { onMount, getContext } from 'svelte';
+	import { onMount, getContext, setContext } from 'svelte';
 
 	import { uuid } from '$stores/uuid';
 	import { type } from '$stores/type';
 	import { name } from '$stores/name';
 
-	import { type ClientMetadata, type ClientType } from '$types/ClientMetadata';
+	import { type ClientMetadata } from '$types/ClientMetadata';
 
-	import Camera from '$components/Camera.svelte';
-	import Monitor from '$components/Monitor.svelte';
 	import SignalingSocket from '$lib/SignalingSocket';
 	import PeerManager from '$lib/PeerManager';
 	import { SvelteMap } from 'svelte/reactivity';
 	import battery from '$stores/battery.svelte';
 
+	const { children } = $props();
+
 	const peers = new SvelteMap<string, ClientMetadata>();
+	setContext('peers', peers);
+
 	const socket: SignalingSocket = getContext('socket');
 
 	onMount(async () => {
@@ -50,14 +52,6 @@
 		// Connect to other peers
 		peerManager.sendIntroduction();
 	});
-
-	function filterPeersByType(peers: SvelteMap<string, ClientMetadata>, type: ClientType) {
-		return Array.from(peers.values().filter((peer) => peer.type === type));
-	}
 </script>
 
-{#if $type === 'camera'}
-	<Camera monitors={filterPeersByType(peers, 'monitor')} />
-{:else}
-	<Monitor cameras={filterPeersByType(peers, 'camera')} />
-{/if}
+{@render children()}
