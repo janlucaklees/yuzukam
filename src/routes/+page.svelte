@@ -1,30 +1,30 @@
 <script lang="ts">
 	import { type } from '$stores/type';
 
-	import OnlineGuard from '$components/guards/OnlineGuard.svelte';
+	import RequireInternetConnection from '$components/guards/RequireInternetConnection.svelte';
 	import PeerProvider from '$components/providers/PeerProvider.svelte';
 	import SignalingSocketProvider from '$components/providers/SignalingSocketProvider.svelte';
-	import SignalingSocketGuard from '$components/guards/SignalingSocketGuard.svelte';
+	import RequireSignalingSocketConnection from '$components/guards/RequireSignalingSocketConnection.svelte';
 	import Camera from '$components/Camera.svelte';
-	import CameraPeerGuard from '$components/guards/CameraPeerGuard.svelte';
+	import RequireCameraPeerPresence from '$components/guards/RequireCameraPeerPresence.svelte';
 	import Monitor from '$components/Monitor.svelte';
-	import InputPermissionGuard from '$components/guards/InputPermissionGuard.svelte';
+	import RequireUserMediaPermission from '$components/guards/RequireUserMediaPermission.svelte';
 </script>
 
-<OnlineGuard>
+<RequireInternetConnection>
 	<SignalingSocketProvider>
-		<SignalingSocketGuard>
+		<RequireSignalingSocketConnection>
 			<PeerProvider>
 				{#if $type === 'camera'}
-					<InputPermissionGuard>
+					<RequireUserMediaPermission>
 						<Camera />
-					</InputPermissionGuard>
+					</RequireUserMediaPermission>
 				{:else}
-					<CameraPeerGuard>
+					<RequireCameraPeerPresence>
 						<Monitor />
-					</CameraPeerGuard>
+					</RequireCameraPeerPresence>
 				{/if}
 			</PeerProvider>
-		</SignalingSocketGuard>
+		</RequireSignalingSocketConnection>
 	</SignalingSocketProvider>
-</OnlineGuard>
+</RequireInternetConnection>
