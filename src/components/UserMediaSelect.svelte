@@ -76,7 +76,7 @@
 		>
 			<div class="bg-yellow-200 py-2 pr-2 pl-4">Camera:</div>
 
-			<div class=" grid grid-cols-2 gap-4 p-4">
+			<div class=" grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
 				{#each availableVideoDevices as device (device.deviceId)}
 					<label class="flex cursor-pointer flex-col overflow-clip rounded-lg">
 						<Screen
