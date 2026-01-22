@@ -13,7 +13,7 @@
 	}
 </script>
 
-<div class="fixed top-0 right-0 flex w-screen justify-end">
+<div class="fixed top-0 right-0 flex">
 	<button
 		type="button"
 		onclick={() => (isMenuOpen = !isMenuOpen)}
