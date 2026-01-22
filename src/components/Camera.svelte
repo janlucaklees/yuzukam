@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { getContext, onDestroy, onMount } from 'svelte';
 	import type { SvelteMap } from 'svelte/reactivity';
+
+	import { selectedVideoInput } from '$stores/selectedVideoInput';
+	import { selectedAudioInput } from '$stores/selectedAudioInput';
+
 	import UserMediaService from '$lib/UserMediaService';
 	import filterPeersByType from '$lib/filterPeersByType';
+	import pickOne from '$lib/pickOne';
+
 	import { type ClientMetadata } from '$types/ClientMetadata';
+
 	import Transmitter from '$components/Transmitter.svelte';
 	import LocalScreen from '$components/LocalScreen.svelte';
 	import Message from '$components/Message.svelte';
-	import pickOne from '$lib/pickOne';
 
 	const peers: SvelteMap<string, ClientMetadata> = getContext('peers');
 	const monitors = $derived(filterPeersByType(peers, 'monitor'));
@@ -17,7 +23,10 @@
 	let userMediaService: UserMediaService | undefined;
 
 	onMount(async () => {
-		userMediaService = new UserMediaService();
+		userMediaService = new UserMediaService({
+			audio: { deviceId: $selectedAudioInput },
+			video: { deviceId: $selectedVideoInput }
+		});
 
 		userMediaService.on('stream', (newStream) => {
 			stream = newStream;
@@ -31,6 +40,13 @@
 			} else {
 				console.error(newError);
 			}
+		});
+
+		$effect(() => {
+			userMediaService?.updateConstraints({
+				audio: { deviceId: $selectedAudioInput },
+				video: { deviceId: $selectedVideoInput }
+			});
 		});
 	});
 

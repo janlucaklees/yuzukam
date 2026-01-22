@@ -10,23 +10,34 @@ interface UserMediaServiceEventMap extends Record<string, unknown[]> {
 export default class UserMediaService {
 	private eventSystem = new EventSystem<UserMediaServiceEventMap>();
 
+	private constraints: MediaStreamConstraints;
+
 	private stream: MediaStream | undefined;
 
-	constructor(
-		private readonly constraints: MediaStreamConstraints = {
-			video: {
-				width: { ideal: 640 },
-				height: { ideal: 360 },
-				frameRate: { ideal: 12 }
+	constructor(constraints: MediaStreamConstraints) {
+		this.constraints = Object.assign(
+			{
+				audio: {
+					echoCancellation: true,
+					noiseSuppression: true,
+					autoGainControl: true
+				},
+				video: {
+					width: { ideal: 640 },
+					height: { ideal: 360 },
+					frameRate: { ideal: 12 }
+				}
 			},
-			audio: {
-				echoCancellation: true,
-				noiseSuppression: true,
-				autoGainControl: true
-			}
-		}
-	) {
+			constraints
+		);
+
 		this.restartStream();
+	}
+
+	public async updateConstraints(constraints: MediaStreamConstraints) {
+		this.constraints = Object.assign(this.constraints, constraints);
+
+		await this.restartStream();
 	}
 
 	private async restartStream() {
