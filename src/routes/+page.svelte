@@ -9,6 +9,7 @@
 	import RequireCameraPeerPresence from '$components/guards/RequireCameraPeerPresence.svelte';
 	import Monitor from '$components/Monitor.svelte';
 	import RequireUserMediaPermission from '$components/guards/RequireUserMediaPermission.svelte';
+	import RequireUserMediaSelection from '$components/guards/RequireUserMediaSelection.svelte';
 </script>
 
 <RequireInternetConnection>
@@ -17,7 +18,9 @@
 			<PeerProvider>
 				{#if $type === 'camera'}
 					<RequireUserMediaPermission>
-						<Camera />
+						<RequireUserMediaSelection>
+							<Camera />
+						</RequireUserMediaSelection>
 					</RequireUserMediaPermission>
 				{:else}
 					<RequireCameraPeerPresence>

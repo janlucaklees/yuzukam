@@ -3,7 +3,7 @@
 
 	interface Props {
 		class?: string;
-		root: HTMLElement;
+		root?: HTMLElement;
 		stream: MediaStream | undefined;
 		muted?: boolean;
 		info?: Snippet;
@@ -44,13 +44,17 @@
 		</div>
 	{/if}
 
-	<div
-		class="absolute top-2 left-2 flex items-center gap-2 rounded-full bg-yellow-200 px-3 py-1 text-xs"
-	>
-		{@render info?.()}
-	</div>
+	{#if info}
+		<div
+			class="absolute top-2 left-2 flex items-center gap-2 rounded-full bg-yellow-200 px-3 py-1 text-xs"
+		>
+			{@render info?.()}
+		</div>
+	{/if}
 
-	<div class="absolute right-2 bottom-2 flex gap-2">
-		{@render controls?.()}
-	</div>
+	{#if controls}
+		<div class="absolute right-2 bottom-2 flex gap-2">
+			{@render controls?.()}
+		</div>
+	{/if}
 </div>
