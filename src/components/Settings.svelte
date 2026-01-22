@@ -36,6 +36,7 @@
 		<div class="flex min-h-14 min-w-0 shrink flex-col gap-4 rounded-bl-lg bg-gray-300 px-4 py-4">
 			<LabeledSelectInput
 				label="Mode:"
+				labelClass="min-w-28"
 				bind:value={$type}
 				options={[
 					{
@@ -49,10 +50,11 @@
 				]}
 			/>
 
-			<LabeledTextInput label="Device Name:" bind:value={$name} />
+			<LabeledTextInput label="Device Name:" labelClass="min-w-28" bind:value={$name} />
 
 			<LabeledSelectInput
 				label="Microphone:"
+				labelClass="min-w-28"
 				bind:value={$selectedAudioInput}
 				options={availableAudioDevices.map((device) => ({
 					value: device.deviceId,
@@ -62,6 +64,7 @@
 
 			<LabeledSelectInput
 				label="Camera:"
+				labelClass="min-w-28"
 				bind:value={$selectedVideoInput}
 				options={availableVideoDevices.map((device) => ({
 					value: device.deviceId,
