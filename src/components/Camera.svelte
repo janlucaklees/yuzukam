@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onDestroy, onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import type { SvelteMap } from 'svelte/reactivity';
 
 	import { selectedVideoInput } from '$stores/selectedVideoInput';
@@ -20,10 +20,9 @@
 
 	let stream: MediaStream | undefined = $state();
 	let error: string | undefined = $state();
-	let userMediaService: UserMediaService | undefined;
 
-	onMount(async () => {
-		userMediaService = new UserMediaService({
+	onMount(() => {
+		let userMediaService: UserMediaService | undefined = new UserMediaService({
 			audio: { deviceId: $selectedAudioInput },
 			video: { deviceId: $selectedVideoInput }
 		});
@@ -48,12 +47,12 @@
 				video: { deviceId: $selectedVideoInput }
 			});
 		});
-	});
 
-	onDestroy(() => {
-		userMediaService?.destroy();
-		userMediaService = undefined;
-		stream = undefined;
+		return () => {
+			userMediaService?.destroy();
+			userMediaService = undefined;
+			stream = undefined;
+		};
 	});
 </script>
 
