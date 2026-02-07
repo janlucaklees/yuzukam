@@ -64,6 +64,4 @@
 	{@render children()}
 {:else if isDeviceSelectionRequired === true}
 	<UserMediaSelect {availableAudioDevices} {availableVideoDevices} {onConfirm} />
-{:else}
-	hooooo
 {/if}
