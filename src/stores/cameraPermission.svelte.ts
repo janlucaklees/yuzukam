@@ -1,4 +1,6 @@
-const cameraPermission = $state<{ state: PermissionState }>({ state: 'prompt' });
+const cameraPermission = $state<{ state: PermissionState | 'initializing' }>({
+	state: 'initializing'
+});
 
 const permissionStatus = await navigator.permissions.query({ name: 'camera' });
 
