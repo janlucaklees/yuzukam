@@ -48,7 +48,13 @@
 		}
 	});
 
-	function onConfirm({ selectedAudioInputId, selectedVideoInputId }) {
+	function onConfirm({
+		selectedAudioInputId,
+		selectedVideoInputId
+	}: {
+		selectedAudioInputId: string;
+		selectedVideoInputId: string;
+	}) {
 		selectedAudioInput.set(selectedAudioInputId);
 		selectedVideoInput.set(selectedVideoInputId);
 	}
