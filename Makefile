@@ -7,6 +7,10 @@ start:
 	docker compose up -d
 	docker compose logs -f frontend
 
+.PHONY=stop
+stop:
+	docker compose stop
+
 .PHONY=image-build
 image-build:
 	docker build -t ghcr.io/janlucaklees/yuzukam:latest .
