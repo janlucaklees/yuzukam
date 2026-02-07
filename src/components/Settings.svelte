@@ -77,25 +77,27 @@
 
 				<LabeledTextInput label="Device Name:" labelClass="min-w-28" bind:value={$name} />
 
-				<LabeledSelectInput
-					label="Microphone:"
-					labelClass="min-w-28"
-					bind:value={$selectedAudioInput}
-					options={availableAudioDevices.map((device) => ({
-						value: device.deviceId,
-						label: device.label
-					}))}
-				/>
+				{#if $type === 'camera'}
+					<LabeledSelectInput
+						label="Microphone:"
+						labelClass="min-w-28"
+						bind:value={$selectedAudioInput}
+						options={availableAudioDevices.map((device) => ({
+							value: device.deviceId,
+							label: device.label
+						}))}
+					/>
 
-				<LabeledSelectInput
-					label="Camera:"
-					labelClass="min-w-28"
-					bind:value={$selectedVideoInput}
-					options={availableVideoDevices.map((device) => ({
-						value: device.deviceId,
-						label: device.label
-					}))}
-				/>
+					<LabeledSelectInput
+						label="Camera:"
+						labelClass="min-w-28"
+						bind:value={$selectedVideoInput}
+						options={availableVideoDevices.map((device) => ({
+							value: device.deviceId,
+							label: device.label
+						}))}
+					/>
+				{/if}
 			</div>
 		</div>
 	{/if}
