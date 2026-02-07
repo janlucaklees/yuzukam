@@ -10,6 +10,8 @@
 
 	let { children } = $props();
 
+	let isInitializing: boolean = $state(true);
+
 	let availableAudioDevices: MediaDeviceInfo[] = $state([]);
 	let availableVideoDevices: MediaDeviceInfo[] = $state([]);
 
@@ -22,9 +24,14 @@
 		const devices = await navigator.mediaDevices.enumerateDevices();
 		availableAudioDevices = devices.filter((device) => device.kind === 'audioinput');
 		availableVideoDevices = devices.filter((device) => device.kind === 'videoinput');
+		isInitializing = false;
 	});
 
 	$effect(() => {
+		if (isInitializing) {
+			return;
+		}
+
 		const audioDevice = determineMediaDevice(availableAudioDevices, $selectedAudioInput);
 		const videoDevice = determineMediaDevice(availableVideoDevices, $selectedVideoInput);
 
