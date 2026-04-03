@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+
+semver_pattern='^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z]+[0-9A-Za-z.-]+)?$'
+
+while read -r local_ref _ remote_ref _
+do
+	case "$local_ref" in
+	refs/tags/*)
+		tag_name=${local_ref#refs/tags/}
+
+		if ! printf '%s\n' "$tag_name" | grep -Eq "$semver_pattern"; then
+			echo "Rejected tag '$tag_name': tags must match v<semver> (example: v1.2.3)." >&2
+			exit 1
+		fi
+
+		tag_type=$(git for-each-ref "$local_ref" --format='%(objecttype)')
+		if [ "$tag_type" != "tag" ]; then
+			echo "Rejected tag '$tag_name': tags must be annotated and include a message." >&2
+			exit 1
+		fi
+
+		tag_message=$(git for-each-ref "$local_ref" --format='%(contents)')
+		if [ -z "$tag_message" ]; then
+			echo "Rejected tag '$tag_name': annotated tags must include a non-empty message." >&2
+			exit 1
+		fi
+		;;
+	esac
+done
