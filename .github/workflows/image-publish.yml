@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - '*'
 
 jobs:
   image-publish:
@@ -25,13 +27,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Derive image tags
+        id: image-tags
+        run: |
+          {
+            echo 'tags<<EOF'
+            echo 'ghcr.io/${{ github.repository_owner }}/yuzukam:latest'
+            echo 'ghcr.io/${{ github.repository_owner }}/yuzukam:${{ github.sha }}'
+            if [[ "${{ github.ref_type }}" == "tag" ]]; then
+              echo 'ghcr.io/${{ github.repository_owner }}/yuzukam:${{ github.ref_name }}'
+            fi
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/yuzukam:latest
-            ghcr.io/${{ github.repository_owner }}/yuzukam:${{ github.sha }}
+          tags: ${{ steps.image-tags.outputs.tags }}
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/yuzukam:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/yuzukam:buildcache,mode=max
