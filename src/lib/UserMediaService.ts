@@ -32,16 +32,16 @@ export default class UserMediaService {
 			constraints
 		);
 
-		this.restartStream();
+		void this.restartStream();
 	}
 
-	public async updateConstraints(constraints: MediaStreamConstraints) {
+	public async updateConstraints(constraints: MediaStreamConstraints): Promise<void> {
 		this.constraints = Object.assign(this.constraints, constraints);
 
 		await this.restartStream();
 	}
 
-	private async restartStream() {
+	private async restartStream(): Promise<void> {
 		// Stop old stream
 		destroyStream(this.stream);
 
@@ -51,10 +51,10 @@ export default class UserMediaService {
 
 			// Register listener to restart stream, if stopped.
 			this.stream.getTracks().forEach((track) =>
-				track.addEventListener('ended', async () => {
+				track.addEventListener('ended', async (): Promise<void> => {
 					console.log('Restarting local camera feed...');
 
-					this.restartStream();
+					void this.restartStream();
 				})
 			);
 
@@ -64,14 +64,14 @@ export default class UserMediaService {
 		}
 	}
 
-	on<K extends keyof UserMediaServiceEventMap>(
+	public on<K extends keyof UserMediaServiceEventMap>(
 		type: K,
 		callback: Callback<UserMediaServiceEventMap[K]>
-	) {
+	): void {
 		this.eventSystem.on(type, callback);
 	}
 
-	public destroy() {
+	public destroy(): void {
 		destroyStream(this.stream);
 	}
 }

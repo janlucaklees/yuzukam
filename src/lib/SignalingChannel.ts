@@ -12,7 +12,7 @@ export default class SignalingChannel {
 	public sendMessage<K extends keyof SignalingEventMap>(
 		subject: K,
 		payload: SignalingEventMap[K]['payload']
-	) {
+	): void {
 		if (this.isClosed) {
 			throw new Error('Channel Closed.');
 		}
@@ -23,7 +23,7 @@ export default class SignalingChannel {
 	public onMessage<K extends keyof SignalingEventMap>(
 		subject: K,
 		callback: (message: SignalingEventMap[K]) => void
-	) {
+	): void {
 		this.socket.onMessage(subject, (message) => {
 			if (this.isClosed) {
 				return;
@@ -35,7 +35,7 @@ export default class SignalingChannel {
 		});
 	}
 
-	close() {
+	public close(): void {
 		this.isClosed = true;
 	}
 }

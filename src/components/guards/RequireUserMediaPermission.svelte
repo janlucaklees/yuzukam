@@ -26,7 +26,7 @@
 		});
 
 		// Initialize the helper and prompt for permissions if not already granted
-		userMediaPermissionHelper.initialize().then(() => {
+		void userMediaPermissionHelper.initialize().then(() => {
 			const state = userMediaPermissionHelper!.getState();
 
 			if (state.isSupported && state.state === 'prompt') {

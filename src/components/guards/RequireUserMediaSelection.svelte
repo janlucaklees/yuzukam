@@ -54,7 +54,7 @@
 	}: {
 		selectedAudioInputId: string;
 		selectedVideoInputId: string;
-	}) {
+	}): void {
 		selectedAudioInput.set(selectedAudioInputId);
 		selectedVideoInput.set(selectedVideoInputId);
 	}

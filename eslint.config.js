@@ -24,15 +24,31 @@ export default ts.config(
 		},
 		rules: {
 			'no-undef': 'off',
-			'@typescript-eslint/explicit-function-return-type': 'error'
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{
+					argsIgnorePattern: '^_'
+				}
+			],
+			'@typescript-eslint/explicit-function-return-type': [
+				'error',
+				{
+					allowExpressions: true
+				}
+			]
 		}
 	},
 	{
-		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
+		files: ['src/**/*.ts', 'src/**/*.svelte', 'src/**/*.svelte.ts', 'src/**/*.svelte.js'],
+		rules: {
+			'@typescript-eslint/no-floating-promises': 'error'
+		},
 		ignores: ['eslint.config.js', 'svelte.config.js'],
 		languageOptions: {
 			parserOptions: {
-				projectService: true,
+				projectService: {
+					allowDefaultProject: ['src/service-worker.ts']
+				},
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser,
 				svelteConfig

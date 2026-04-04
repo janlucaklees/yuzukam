@@ -21,7 +21,7 @@
 
 	let isEnabled = $state(isInitialyEnabled);
 
-	function toggle() {
+	function toggle(): void {
 		isEnabled = !isEnabled;
 
 		onToggle(isEnabled);

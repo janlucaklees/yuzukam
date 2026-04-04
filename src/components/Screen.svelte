@@ -19,10 +19,13 @@
 		controls
 	}: Props = $props();
 
-	function srcObject(node: HTMLVideoElement, stream: MediaStream) {
+	function srcObject(
+		node: HTMLVideoElement,
+		stream: MediaStream
+	): { update(nextStream: MediaStream): void } {
 		node.srcObject = stream;
 		return {
-			update(nextStream: MediaStream) {
+			update(nextStream: MediaStream): void {
 				node.srcObject = nextStream;
 			}
 		};

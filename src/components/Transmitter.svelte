@@ -31,7 +31,7 @@
 		channel = socket.createChannel(peer.uuid);
 		connection = new PeerConnectionHandler(channel);
 		connection.setToTransmit(stream);
-		connection.call();
+		void connection.call();
 
 		connection.on('connectionstatechange', (newState) => {
 			connectionState = newState;

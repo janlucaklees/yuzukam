@@ -42,7 +42,7 @@
 		});
 
 		$effect(() => {
-			userMediaService?.updateConstraints({
+			void userMediaService?.updateConstraints({
 				audio: { deviceId: $selectedAudioInput },
 				video: { deviceId: $selectedVideoInput }
 			});

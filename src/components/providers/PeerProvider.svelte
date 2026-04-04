@@ -60,7 +60,7 @@
 
 		//
 		// Late initialization of the BatteryMonitor to not block the peer manager from connecting to peers.
-		batteryMonitor.initialize();
+		void batteryMonitor.initialize();
 
 		//
 		// Return cleanup method

@@ -52,15 +52,15 @@
 		channel?.close();
 	});
 
-	function toggleAudio(isEnabled: boolean) {
+	function toggleAudio(isEnabled: boolean): void {
 		isMuted = !isEnabled;
 	}
 
-	function toggleFullscreen(isEnabled: boolean) {
+	function toggleFullscreen(isEnabled: boolean): void {
 		if (isEnabled) {
-			screen.requestFullscreen();
+			void screen.requestFullscreen();
 		} else {
-			document.exitFullscreen();
+			void document.exitFullscreen();
 		}
 	}
 </script>

@@ -55,7 +55,7 @@ export default class SignalingSocket {
 		return socket;
 	}
 
-	private reconnect() {
+	private reconnect(): void {
 		setTimeout(() => {
 			console.log('reconnecting...');
 			this.socket = this.createSocket();
@@ -66,7 +66,7 @@ export default class SignalingSocket {
 		recipient: string,
 		subject: K,
 		payload: SignalingEventMap[K]['payload']
-	) {
+	): void {
 		const message = {
 			sender: this.clientUuid,
 			recipient,
@@ -85,8 +85,8 @@ export default class SignalingSocket {
 	public onMessage<K extends keyof SignalingEventMap>(
 		subject: K,
 		callback: (message: SignalingEventMap[K]) => void
-	) {
-		const preparedCallback = (event: WebSocketEventMap['message']) => {
+	): void {
+		const preparedCallback = (event: WebSocketEventMap['message']): void => {
 			const message = JSON.parse(event.data);
 
 			if (message.subject === subject) {
@@ -101,7 +101,7 @@ export default class SignalingSocket {
 	public on<K extends keyof WebSocketEventMap>(
 		type: K,
 		callback: (event: WebSocketEventMap[K]) => void
-	) {
+	): void {
 		this.listeners.push({ type, callback });
 		this.socket.addEventListener(type, callback);
 	}
@@ -111,7 +111,7 @@ export default class SignalingSocket {
 		return channel;
 	}
 
-	public close() {
+	public close(): void {
 		this.socket.close(CloseCodes.GRACEFUL_SHUTDOWN, 'Connection closed: Graceful shutdown.');
 	}
 }

@@ -11,13 +11,13 @@
 
 	let { mediaStream, name, class: clazz = '' }: Props = $props();
 
-	function toggleVideo(isEnabled: boolean) {
+	function toggleVideo(isEnabled: boolean): void {
 		if (mediaStream) {
 			mediaStream.getVideoTracks()[0].enabled = isEnabled;
 		}
 	}
 
-	function toggleAudio(isEnabled: boolean) {
+	function toggleAudio(isEnabled: boolean): void {
 		if (mediaStream) {
 			mediaStream.getAudioTracks()[0].enabled = isEnabled;
 		}

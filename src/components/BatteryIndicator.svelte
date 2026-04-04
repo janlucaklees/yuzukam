@@ -6,7 +6,7 @@
 
 	let { level, isCharging }: Props = $props();
 
-	function getBatteryLevelClass(level: number) {
+	function getBatteryLevelClass(level: number): string | undefined {
 		if (level <= 0.05) {
 			return 'battery-indicator--danger';
 		}

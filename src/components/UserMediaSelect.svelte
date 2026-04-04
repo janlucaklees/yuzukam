@@ -35,7 +35,7 @@
 		});
 	});
 
-	function confirmSelection() {
+	function confirmSelection(): void {
 		onConfirm({
 			selectedAudioInputId: currentAudioInputId,
 			selectedVideoInputId: currentVideoInputId

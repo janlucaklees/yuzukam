@@ -26,7 +26,7 @@ export default class PeerConnectionHandler {
 
 		this.channel.onMessage('icecandidate', (message) => {
 			if (this.connection.remoteDescription) {
-				this.connection.addIceCandidate(message.payload);
+				void this.connection.addIceCandidate(message.payload);
 			} else {
 				this.bufferedIceCandidates.push(message.payload);
 			}
@@ -35,7 +35,7 @@ export default class PeerConnectionHandler {
 		// Register listener for receiving answer.
 		this.channel.onMessage('description', (message) => {
 			if (message.payload.type === 'answer') {
-				this.setRemoteDescription(message.payload);
+				void this.setRemoteDescription(message.payload);
 			}
 		});
 
@@ -65,39 +65,41 @@ export default class PeerConnectionHandler {
 		});
 	}
 
-	on<K extends keyof PeerConnectionHandlerEventMap>(
+	public on<K extends keyof PeerConnectionHandlerEventMap>(
 		type: K,
 		callback: Callback<PeerConnectionHandlerEventMap[K]>
-	) {
+	): void {
 		this.eventSystem.on(type, callback);
 	}
 
-	private async setRemoteDescription(description: RTCSessionDescriptionInit) {
+	private async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
 		await this.connection.setRemoteDescription(description);
 
-		this.bufferedIceCandidates.forEach((candidate) => this.connection.addIceCandidate(candidate));
+		this.bufferedIceCandidates.forEach(
+			(candidate) => void this.connection.addIceCandidate(candidate)
+		);
 		this.bufferedIceCandidates = [];
 	}
 
-	public setToReceive() {
+	public setToReceive(): void {
 		this.connection.addTransceiver('video', { direction: 'recvonly' });
 		this.connection.addTransceiver('audio', { direction: 'recvonly' });
 	}
 
-	public setToTransmit(stream: MediaStream) {
+	public setToTransmit(stream: MediaStream): void {
 		for (const track of stream.getTracks()) {
 			this.connection.addTrack(track, stream);
 		}
 	}
 
-	async call() {
+	public async call(): Promise<void> {
 		// Create offer, set it as a local description and send it to the peer.
 		const offer = await this.connection.createOffer();
 		await this.connection.setLocalDescription(offer);
 		this.channel.sendMessage('description', offer);
 	}
 
-	close() {
+	public close(): void {
 		this.connection.close();
 	}
 }

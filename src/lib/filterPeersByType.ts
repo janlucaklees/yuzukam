@@ -4,6 +4,6 @@ import type { SvelteMap } from 'svelte/reactivity';
 export default function filterPeersByType(
 	peers: SvelteMap<string, ClientMetadata>,
 	type: ClientType
-) {
+): ClientMetadata[] {
 	return Array.from(peers.values().filter((peer) => peer.type === type));
 }
