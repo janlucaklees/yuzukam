@@ -25,13 +25,26 @@ jobs:
             exit 1
           fi
 
-          tag_type="$(git for-each-ref "refs/tags/${GITHUB_REF_NAME}" --format='%(objecttype)')"
-          if [[ "$tag_type" != "tag" ]]; then
-            echo "Invalid tag '${GITHUB_REF_NAME}': tags must be annotated." >&2
+          tag_ref="refs/tags/${GITHUB_REF_NAME}"
+
+          if ! git rev-parse --verify "$tag_ref" >/dev/null 2>&1; then
+            echo "Tag '${tag_ref}' not found in local checkout." >&2
             exit 1
           fi
 
-          tag_message="$(git for-each-ref "refs/tags/${GITHUB_REF_NAME}" --format='%(contents)')"
+          tag_type="$(git cat-file -t "$tag_ref" 2>/dev/null || true)"
+
+          if [[ -z "$tag_type" ]]; then
+            echo "Invalid tag '${GITHUB_REF_NAME}': could not determine object type for '${tag_ref}'." >&2
+            exit 1
+          fi
+
+          if [[ "$tag_type" != "tag" ]]; then
+            echo "Invalid tag '${GITHUB_REF_NAME}': expected annotated tag, got '${tag_type}'." >&2
+            exit 1
+          fi
+
+          tag_message="$(git cat-file tag "$tag_ref" | sed '1,/^$/d')"
           if [[ -z "$tag_message" ]]; then
             echo "Invalid tag '${GITHUB_REF_NAME}': annotated tags must include a non-empty message." >&2
             exit 1
