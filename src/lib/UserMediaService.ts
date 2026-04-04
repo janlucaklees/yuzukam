@@ -1,5 +1,6 @@
 import { type Callback } from '$types/Callback';
-import EventSystem from '$lib/EventSystem';
+import { EventSystem } from '$lib/event-system';
+import destroyStream from '$lib/destroyStream';
 
 interface UserMediaServiceEventMap extends Record<string, unknown[]> {
 	'permission-state': [state: PermissionState];
@@ -42,7 +43,7 @@ export default class UserMediaService {
 
 	private async restartStream() {
 		// Stop old stream
-		this.ensureStreamStopped(this.stream);
+		destroyStream(this.stream);
 
 		// Get and set new stream
 		try {
@@ -70,16 +71,7 @@ export default class UserMediaService {
 		this.eventSystem.on(type, callback);
 	}
 
-	private ensureStreamStopped(stream: MediaStream | undefined) {
-		if (!stream) {
-			return;
-		}
-
-		stream.getTracks().forEach((t) => t.stop());
-		stream.getTracks().forEach((t) => stream.removeTrack(t));
-	}
-
 	public destroy() {
-		this.ensureStreamStopped(this.stream);
+		destroyStream(this.stream);
 	}
 }

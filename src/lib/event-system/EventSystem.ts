@@ -1,6 +1,9 @@
 import type { Callback } from '$types/Callback';
+import type EventSystemInterface from './EventSystemInterface';
 
-export default class EventSystem<EventMap extends Record<keyof EventMap, unknown[]>> {
+export default class EventSystem<EventMap extends Record<keyof EventMap, unknown[]>>
+	implements EventSystemInterface<EventMap>
+{
 	private listeners: {
 		[K in keyof EventMap]?: Callback<EventMap[K]>[];
 	} = {};
@@ -12,12 +15,16 @@ export default class EventSystem<EventMap extends Record<keyof EventMap, unknown
 		return this.listeners[type];
 	}
 
-	on<K extends keyof EventMap>(type: K, callback: Callback<EventMap[K]>) {
+	on<K extends keyof EventMap>(type: K, callback: Callback<EventMap[K]>): void {
 		const typeListeners = this.getListeners(type);
 		typeListeners.push(callback);
 	}
 
-	dispatch<K extends keyof EventMap>(type: K, parameters: EventMap[K]) {
+	dispatch<K extends keyof EventMap>(type: K, parameters: EventMap[K]): void {
 		this.getListeners(type)?.forEach((callback) => callback(...parameters));
+	}
+
+	destroy(): void {
+		this.listeners = {};
 	}
 }

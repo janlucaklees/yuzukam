@@ -1,21 +1,49 @@
 <script lang="ts">
 	import Message from '$components/Message.svelte';
 	import pickOne from '$lib/pickOne';
-	import cameraPermission from '$stores/cameraPermission.svelte';
+	import UserMediaPermissionHelper, {
+		type UserMediaPermissionState
+	} from '$lib/UserMediaPermissionHelper';
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
 
-	onMount(async () => {
-		const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+	let userMediaPermissionHelper: UserMediaPermissionHelper | undefined;
+	let userMediaPermissionState = $state<UserMediaPermissionState>({
+		isSupported: undefined,
+		state: undefined
+	});
 
-		stream.getTracks().forEach((track) => track.stop());
+	onMount(() => {
+		//
+		// Setup permissions monitoring.
+		userMediaPermissionHelper = new UserMediaPermissionHelper();
+
+		// Listen for changing user permission
+		userMediaPermissionHelper.on('change', (state) => {
+			userMediaPermissionState.isSupported = state.isSupported;
+			userMediaPermissionState.state = state.state;
+		});
+
+		// Initialize the helper and prompt for permissions if not already granted
+		userMediaPermissionHelper.initialize().then(() => {
+			const state = userMediaPermissionHelper!.getState();
+
+			if (state.isSupported && state.state === 'prompt') {
+				userMediaPermissionHelper!.promptForPermissions();
+			}
+		});
+
+		return (): void => {
+			void userMediaPermissionHelper!.destroy();
+			userMediaPermissionHelper = undefined;
+		};
 	});
 </script>
 
-{#if cameraPermission.state === 'granted'}
+{#if userMediaPermissionState.state === 'granted'}
 	{@render children()}
-{:else if cameraPermission.state === 'prompt'}
+{:else if userMediaPermissionState.state === 'prompt'}
 	<Message
 		imageSource="yuzu_covering_eyes.png"
 		message={pickOne([
@@ -25,7 +53,7 @@
 		])}
 		hint="Please click “Allow while visiting the site” to give access to your camera and microphone."
 	/>
-{:else if cameraPermission.state === 'denied'}
+{:else if userMediaPermissionState.state === 'denied'}
 	<Message
 		imageSource="yuzu_pouting.png"
 		message={pickOne([

@@ -1,5 +1,5 @@
 import SignalingChannel from '$lib/SignalingChannel';
-import EventSystem from '$lib/EventSystem';
+import { EventSystem } from '$lib/event-system';
 import type { Callback } from '$types/Callback';
 
 interface PeerConnectionHandlerEventMap extends Record<string, unknown[]> {
