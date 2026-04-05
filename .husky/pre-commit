@@ -1,2 +1,4 @@
+bun run format
 bunx lint-staged
 reuse lint --lines
+bun run build
