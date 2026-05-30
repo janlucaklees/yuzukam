@@ -54,6 +54,6 @@
 	"dependencies": {
 		"sass": "^1.86.0",
 		"svelte-ionicons": "^2.0.1",
-		"uuid": "^11.1.0"
+		"uuid": "^14.0.0"
 	}
 }
