@@ -1,4 +1,4 @@
-<script module>
+<script module lang="ts">
 	declare const __APP_VERSION__: string;
 </script>
 

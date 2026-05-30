@@ -1,9 +1,9 @@
 import type { Callback } from '$types/Callback';
 import type EventSystemInterface from './EventSystemInterface';
 
-export default class EventSystem<EventMap extends Record<keyof EventMap, unknown[]>>
-	implements EventSystemInterface<EventMap>
-{
+export default class EventSystem<
+	EventMap extends Record<keyof EventMap, unknown[]>
+> implements EventSystemInterface<EventMap> {
 	private listeners: {
 		[K in keyof EventMap]?: Callback<EventMap[K]>[];
 	} = {};
