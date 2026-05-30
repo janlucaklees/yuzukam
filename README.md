@@ -78,6 +78,18 @@ Then, from any other device in your home network, open the same Yuzukam address 
 
 ---
 
+## Donations
+
+The most valuable contribution to this project is your time and ideas. Open source becomes meaningful through people participating in it.
+
+If you would like to support the project financially, you can do so through the following options:
+
+- [PayPal](https://www.paypal.com/donate/?hosted_button_id=9ZYAV83CAZ5A4)
+
+Thank you for using, sharing, contributing and/or supporting the project in whatever way makes sense to you.
+
+---
+
 ## License
 
 The source code for this project is licensed under the Mozilla Public License 2.0.
